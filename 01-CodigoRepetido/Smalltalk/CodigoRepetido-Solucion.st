@@ -39,55 +39,56 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 17:12:00'!
+!IdiomTest methodsFor: 'testing' stamp: 'yn 9/3/2017 18:25:12'!
 test03CanNotAddACustomerWithEmptyName 
 
-	|objectToBeModified colaborationObject objectState |
+	|objectToBeModified objectState collaborationObject |
 	
 	objectToBeModified:=CustomerBook new.
-     colaborationObject:=[:customerBook | customerBook addCustomerNamed: ''].
+     collaborationObject:=[:customerBook | customerBook addCustomerNamed: ''].
 	objectState:=[:anError :customerBook | 
 						self assert: customerBook isEmpty.
 						self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage
 					].
 	
 	
-	self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: Error ensuringFinalState: objectState! !
+	self applyingThisColaboration: collaborationObject overTheObject: objectToBeModified generatesAnError: Error ensuringFinalState: objectState! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 17:11:22'!
+!IdiomTest methodsFor: 'testing' stamp: 'yn 9/3/2017 18:26:37'!
 test04CanNotRemoveAnInvalidCustomer
 	
-	|objectToBeModified colaborationObject objectState  |
+	|objectToBeModified objectState  collaborationObject |
 	
 	objectToBeModified :=CustomerBook new.
 	objectToBeModified  addCustomerNamed: 'John Lennon'.
-	colaborationObject:= [ :customerBook | customerBook removeCustomerNamed: 'Paul McCartney'].
+	collaborationObject:= [ :customerBook | customerBook removeCustomerNamed: 'Paul McCartney'].
 	objectState:=[:anError :customerBook | 
 						self assert: customerBook numberOfCustomers = 1.
 		 				self assert: (customerBook includesCustomerNamed: 'John Lennon')
 				     ].
       
-     self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: NotFound  ensuringFinalState: objectState 
+     self applyingThisColaboration: collaborationObject overTheObject: objectToBeModified generatesAnError: NotFound  ensuringFinalState: objectState 
 ! !
 
 
-!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/3/2017 17:07:17'!
-applyingThisColaboration: aColaboration overTheObject: anObjectToBeColaborated generatesAnError: anErrorClass ensuringFinalState: somthingEnsuredAfterError 
+!IdiomTest methodsFor: 'helpers' stamp: 'yn 9/3/2017 18:15:55'!
+applyingThisColaboration: aCollaborationForTheObject overTheObject: anObjectToBeCollaborated generatesAnError: anErrorClass ensuringFinalState: somethingEnsuredAfterError	
 	
-	
-	[(aColaboration value:anObjectToBeColaborated )]
-		on: anErrorClass 
-		do: [:anError | (somthingEnsuredAfterError value:anError value:anObjectToBeColaborated )]! !
 
-!IdiomTest methodsFor: 'helpers' stamp: 'yn 9/3/2017 17:51:56'!
+
+	[(aCollaborationForTheObject value:anObjectToBeCollaborated )]
+		on: anErrorClass 
+		do: [:anError | (somethingEnsuredAfterError value:anError value:anObjectToBeCollaborated )]! !
+
+!IdiomTest methodsFor: 'helpers' stamp: 'yn 9/3/2017 18:09:55'!
 excecutionTimeInMillisecondsOf: aBlockClosure withinThisContext: aBlockClosure2 isLessThan: aSmallInteger 
-		| tempAfterRunning tempBeforeRunning |
+		| timeMillisecondsAfterRunning timeMillisecondsBeforeRunning |
 	aBlockClosure2.
-	tempBeforeRunning := Time millisecondClockValue.
+	timeMillisecondsBeforeRunning := Time millisecondClockValue.
 	aBlockClosure .
-	tempAfterRunning := Time millisecondClockValue.
+	timeMillisecondsAfterRunning := Time millisecondClockValue.
 	
-	self assert: (tempAfterRunning-tempBeforeRunning) < aSmallInteger ! !
+	self assert: (timeMillisecondsAfterRunning-timeMillisecondsBeforeRunning) < aSmallInteger ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
