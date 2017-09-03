@@ -39,44 +39,39 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/2/2017 23:20:44'!
+!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 16:47:47'!
 test03CanNotAddACustomerWithEmptyName 
 
-	|objectToBeModified colaborationObject objectState customerBook anError |
+	|objectToBeModified colaborationObject objectState |
 	
-	objectToBeModified:=[		
-		customerBook := CustomerBook new.
-		customerBook addCustomerNamed: ''.
-	].
-     colaborationObject:=[customerBook addCustomerNamed: ''].
-	objectState:=[(customerBook isEmpty) & (anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage)].
+	objectToBeModified:=CustomerBook new.
+     colaborationObject:=[:customerBook | customerBook addCustomerNamed: ''].
+	objectState:=[:anError :customerBook | customerBook isEmpty & anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage].
 	
 	
 	self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: Error ensuringFinalState: objectState! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/2/2017 23:20:54'!
+!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 16:54:42'!
 test04CanNotRemoveAnInvalidCustomer
 	
-	|objectToBeModified colaborationObject objectState customerBook  johnLennon |
-			
-	objectToBeModified := [ customerBook:=CustomerBook new.
-								johnLennon := 'John Lennon'.
-								customerBook addCustomerNamed: johnLennon.
-							   ].
-	colaborationObject:= [ customerBook removeCustomerNamed: 'Paul McCartney'].
-	objectState:=[(customerBook numberOfCustomers = 1) & (customerBook includesCustomerNamed: johnLennon)].
+	|objectToBeModified colaborationObject objectState  |
+	
+	objectToBeModified :=CustomerBook new.
+	objectToBeModified  addCustomerNamed: 'John Lennon'.
+	colaborationObject:= [ :customerBook | customerBook removeCustomerNamed: 'Paul McCartney'].
+	objectState:=[:anError :customerBook | (customerBook numberOfCustomers = 1) & (customerBook includesCustomerNamed: 'John Lennon')].
       
      self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: NotFound  ensuringFinalState: objectState 
 ! !
 
 
-!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/2/2017 23:20:11'!
-applyingThisColaboration: aColaboration overTheObject: aObjecttoBeColaborated generatesAnError: anErrorClass ensuringFinalState: somthingEnsuredAfterError 
-	aObjecttoBeColaborated.
-	aColaboration
+!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/3/2017 16:56:26'!
+applyingThisColaboration: aColaboration overTheObject: anObjectToBeColaborated generatesAnError: anErrorClass ensuringFinalState: somthingEnsuredAfterError 
+	
+	
+	[(aColaboration value:anObjectToBeColaborated )]
 		on: anErrorClass 
-		do: [ :anError | 
-			self assert: somthingEnsuredAfterError]! !
+		do: [:anError | (somthingEnsuredAfterError value:anError value:anObjectToBeColaborated )]! !
 
 !IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/2/2017 21:23:12'!
 excecutionTimeInMillisecondsOf: aBlockClosure withinThisContext: aBlockClosure2 isLessThan: aSmallInteger 
