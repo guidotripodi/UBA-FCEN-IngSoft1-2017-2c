@@ -39,19 +39,22 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 16:47:47'!
+!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 17:12:00'!
 test03CanNotAddACustomerWithEmptyName 
 
 	|objectToBeModified colaborationObject objectState |
 	
 	objectToBeModified:=CustomerBook new.
      colaborationObject:=[:customerBook | customerBook addCustomerNamed: ''].
-	objectState:=[:anError :customerBook | customerBook isEmpty & anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage].
+	objectState:=[:anError :customerBook | 
+						self assert: customerBook isEmpty.
+						self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage
+					].
 	
 	
 	self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: Error ensuringFinalState: objectState! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 16:54:42'!
+!IdiomTest methodsFor: 'testing' stamp: 'ELR 9/3/2017 17:11:22'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	|objectToBeModified colaborationObject objectState  |
@@ -59,13 +62,16 @@ test04CanNotRemoveAnInvalidCustomer
 	objectToBeModified :=CustomerBook new.
 	objectToBeModified  addCustomerNamed: 'John Lennon'.
 	colaborationObject:= [ :customerBook | customerBook removeCustomerNamed: 'Paul McCartney'].
-	objectState:=[:anError :customerBook | (customerBook numberOfCustomers = 1) & (customerBook includesCustomerNamed: 'John Lennon')].
+	objectState:=[:anError :customerBook | 
+						self assert: customerBook numberOfCustomers = 1.
+		 				self assert: (customerBook includesCustomerNamed: 'John Lennon')
+				     ].
       
      self applyingThisColaboration: colaborationObject overTheObject: objectToBeModified generatesAnError: NotFound  ensuringFinalState: objectState 
 ! !
 
 
-!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/3/2017 16:56:26'!
+!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/3/2017 17:07:17'!
 applyingThisColaboration: aColaboration overTheObject: anObjectToBeColaborated generatesAnError: anErrorClass ensuringFinalState: somthingEnsuredAfterError 
 	
 	
