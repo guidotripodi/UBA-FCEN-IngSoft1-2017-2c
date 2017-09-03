@@ -79,15 +79,15 @@ applyingThisColaboration: aColaboration overTheObject: anObjectToBeColaborated g
 		on: anErrorClass 
 		do: [:anError | (somthingEnsuredAfterError value:anError value:anObjectToBeColaborated )]! !
 
-!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/2/2017 21:23:12'!
+!IdiomTest methodsFor: 'helpers' stamp: 'yn 9/3/2017 17:51:56'!
 excecutionTimeInMillisecondsOf: aBlockClosure withinThisContext: aBlockClosure2 isLessThan: aSmallInteger 
-		|millisecondsBeforeRunning millisecondsAfterRunning|
+		| tempAfterRunning tempBeforeRunning |
 	aBlockClosure2.
-	millisecondsBeforeRunning := Time millisecondClockValue.
+	tempBeforeRunning := Time millisecondClockValue.
 	aBlockClosure .
-	millisecondsAfterRunning := Time millisecondClockValue.
+	tempAfterRunning := Time millisecondClockValue.
 	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < aSmallInteger ! !
+	self assert: (tempAfterRunning-tempBeforeRunning) < aSmallInteger ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
