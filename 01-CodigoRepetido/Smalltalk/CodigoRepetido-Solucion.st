@@ -71,12 +71,12 @@ test04CanNotRemoveAnInvalidCustomer
 ! !
 
 
-!IdiomTest methodsFor: 'helpers' stamp: 'yn 9/3/2017 18:15:55'!
+!IdiomTest methodsFor: 'helpers' stamp: 'ELR 9/4/2017 20:30:35'!
 applyingThisColaboration: aCollaborationForTheObject overTheObject: anObjectToBeCollaborated generatesAnError: anErrorClass ensuringFinalState: somethingEnsuredAfterError	
 	
 
 
-	[(aCollaborationForTheObject value:anObjectToBeCollaborated )]
+	[(aCollaborationForTheObject value:anObjectToBeCollaborated ). self fail]
 		on: anErrorClass 
 		do: [:anError | (somethingEnsuredAfterError value:anError value:anObjectToBeCollaborated )]! !
 
