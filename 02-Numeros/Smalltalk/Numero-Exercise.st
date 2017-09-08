@@ -282,13 +282,13 @@ initalizeWith: aValue
 	value := aValue! !
 
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/7/2017 21:45:43'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'yn 9/8/2017 17:54:01'!
 * aMultiplier
- 
+ "
 	(aMultiplier isKindOf: Entero) ifTrue: [^self class with: value * aMultiplier integerValue].
 	(aMultiplier isKindOf: Fraccion) ifTrue: [^(self * aMultiplier numerator )/aMultiplier denominator ].
-	
-	! !
+	"
+	^aMultiplier multipliqueEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 10:59:59'!
 + anAdder 
