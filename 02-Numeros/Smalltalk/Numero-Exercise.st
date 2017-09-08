@@ -290,27 +290,52 @@ initalizeWith: aValue
 	
 	! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/7/2017 20:51:09'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 10:59:59'!
 + anAdder 
-	
+	"
+	Sumar sin polimorfismo
 	(anAdder isKindOf: (Entero)) ifTrue: [^self class with: value + anAdder integerValue] ifFalse: [^(self * anAdder denominator + anAdder numerator) / (anAdder denominator ) ]
-	
-! !
+	"
+  ^anAdder sumarEntero: self! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:14'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:33:52'!
 / aDivisor 
+"
+No polimorfica
+	(aDivisor isKindOf: Entero) ifTrue: [^Fraccion with: self over: aDivisor].
+	(aDivisor isKindOf: Fraccion) ifTrue: [^(self * aDivisor denominator) / aDivisor numerator].
 	
-	^Fraccion with: self over: aDivisor! !
+"
+
+^aDivisor divideEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
 // aDivisor 
 	
 	^self class with: value // aDivisor integerValue! !
 
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:30:11'!
+divideEntero: aDividend
+	
+	^Fraccion with: aDividend over: self ! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:57:14'!
+divideFraccion: aDividend
+	
+	^Fraccion with: ( aDividend numerator) over: self * aDividend denominator ! !
+
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
 	
 	^self class with: (value gcd: anEntero integerValue)! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:01:37'!
+sumarEntero: anEntero 
+	^self class with: value + anEntero integerValue.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:13:49'!
+sumarFraccion: aFraccion 
+	^( aFraccion denominator * self  + aFraccion numerator) / (aFraccion denominator ) ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -367,21 +392,23 @@ hash
 	^(numerator hash / denominator hash) hash! !
 
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/7/2017 21:51:23'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:25:08'!
 * aMultiplier 
 
 
-	(aMultiplier isKindOf: Entero) ifTrue: [^(numerator * aMultiplier integerValue) / denominator ].
-	(aMultiplier isKindOf: Fraccion) ifTrue: [^(numerator * aMultiplier numerator) / denominator * aMultiplier denominator ].
+	(aMultiplier isKindOf: Entero) ifTrue: [^(numerator * aMultiplier) / denominator ].
+	(aMultiplier isKindOf: Fraccion) ifTrue: [^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator) ].
 	
 	
 	
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/7/2017 21:39:44'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:15:40'!
 + anAdder 
 	
-	| newNumerator newDenominator sumadorFraccion sumadorEntero|
+	
+	"
+	Forma no polimorfica
 	
 	sumadorFraccion:=[ :aFraccion |
 	newNumerator := ( numerator * aFraccion denominator) + (denominator * aFraccion numerator).
@@ -395,12 +422,34 @@ hash
 		^( denominator * aEntero  +  numerator) / ( denominator ) 
 		].
 	
-	(anAdder isKindOf: (Fraccion)) ifTrue:[ (sumadorFraccion value: anAdder)] ifFalse:  [ (sumadorEntero value: anAdder )]! !
+	(anAdder isKindOf: (Fraccion)) ifTrue:[ (sumadorFraccion value: anAdder)] ifFalse:  [ (sumadorEntero value: anAdder )]
+	"
+	^anAdder sumarFraccion: self! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:14'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:44:32'!
 / aDivisor 
 	
-	^(numerator * aDivisor denominator) / (denominator * aDivisor numerator)! !
+	^aDivisor divideFraccion: self
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:42:54'!
+divideFraccion: aFraccion 
+	^(self denominator * aFraccion numerator) / (self numerator * aFraccion denominator).! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:05:01'!
+sumarEntero: anEntero 
+	 ^(anEntero * denominator +  numerator) /  denominator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:10:01'!
+sumarFraccion: aFraccion 
+
+	
+	| newDenominator newNumerator |
+	newNumerator := ( numerator * aFraccion denominator) + (denominator * aFraccion numerator).
+	newDenominator := denominator * aFraccion denominator.
+	
+	^newNumerator / newDenominator 
+	! !
 
 
 !Fraccion methodsFor: 'accessing' stamp: 'HernanWilkinson 5/7/2016 21:56'!
@@ -412,6 +461,11 @@ denominator
 numerator
 
 	^ numerator! !
+
+
+!Fraccion methodsFor: 'arithmetic operation' stamp: 'ELR 9/8/2017 11:38:36'!
+divideEntero: anEntero 
+	^(self denominator * anEntero)/self numerator.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
