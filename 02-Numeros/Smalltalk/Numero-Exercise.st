@@ -337,6 +337,17 @@ sumarEntero: anEntero
 sumarFraccion: aFraccion 
 	^( aFraccion denominator * self  + aFraccion numerator) / (aFraccion denominator ) ! !
 
+
+!Entero methodsFor: 'as yet unclassified' stamp: 'yn 9/8/2017 17:31:31'!
+multipliqueEntero: aMulti
+
+	^self class with: value * aMulti integerValue! !
+
+!Entero methodsFor: 'as yet unclassified' stamp: 'yn 9/8/2017 17:31:23'!
+multipliqueFraccion: aMulti
+
+	^Fraccion with:  (self * aMulti numerator ) over: aMulti denominator! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Entero class' category: #'Numero-Exercise'!
@@ -392,12 +403,14 @@ hash
 	^(numerator hash / denominator hash) hash! !
 
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'ELR 9/8/2017 11:25:08'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'yn 9/8/2017 17:00:02'!
 * aMultiplier 
 
-
+"
 	(aMultiplier isKindOf: Entero) ifTrue: [^(numerator * aMultiplier) / denominator ].
 	(aMultiplier isKindOf: Fraccion) ifTrue: [^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator) ].
+	"
+	^aMultiplier multipliqueFraccion: self
 	
 	
 	
@@ -466,6 +479,17 @@ numerator
 !Fraccion methodsFor: 'arithmetic operation' stamp: 'ELR 9/8/2017 11:38:36'!
 divideEntero: anEntero 
 	^(self denominator * anEntero)/self numerator.! !
+
+
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'yn 9/8/2017 17:31:49'!
+multipliqueEntero: anEntero
+
+	^(self numerator * anEntero) / self denominator ! !
+
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'yn 9/8/2017 17:31:58'!
+multipliqueFraccion: aFraccion
+
+	^(self numerator * aFraccion numerator) / (self denominator * aFraccion denominator) ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
