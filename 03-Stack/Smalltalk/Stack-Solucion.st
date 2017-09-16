@@ -137,44 +137,114 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 ! !
 
 
-!classDefinition: #OOStack category: #'Stack-Exercise'!
-Object subclass: #OOStack
-	instanceVariableNames: 'substack value'
+!classDefinition: #OOStackMixinElement category: #'Stack-Exercise'!
+Object subclass: #OOStackMixinElement
+	instanceVariableNames: 'substack superstack value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'ELR 9/15/2017 08:22:26'!
+!OOStackMixinElement methodsFor: 'creation' stamp: 'ELR 9/16/2017 15:21:32'!
 initialize
-	substack:=OOStackBottom onBottomOf: self.! !
+	self asBottomOf: self.
+	self rebase: self .
+! !
 
 
-!OOStack methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 08:00:05'!
+!OOStackMixinElement methodsFor: 'converting' stamp: 'ELR 9/16/2017 15:21:06'!
+asBottomOf: aStack
+	superstack:=aStack.! !
+
+!OOStackMixinElement methodsFor: 'converting' stamp: 'ELR 9/16/2017 15:07:18'!
+store: aString
+	value := aString .! !
+
+
+!OOStackMixinElement methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 14:20:25'!
 isEmpty
-	^substack isBottom.! !
+	^self size = 0.! !
+
+!OOStackMixinElement methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 14:19:55'!
+size
+	^substack size + 1.! !
+
+
+!OOStackMixinElement methodsFor: 'accessing' stamp: 'ELR 9/16/2017 14:37:12'!
+top
+	^value.! !
+
+
+!OOStackMixinElement methodsFor: 'associating' stamp: 'ELR 9/16/2017 14:47:57'!
+pop
+	substack push: superstack .
+	^self top .! !
+
+!OOStackMixinElement methodsFor: 'associating' stamp: 'ELR 9/16/2017 15:21:36'!
+push: aStackElement 
+	self asBottomOf: aStackElement.
+	aStackElement rebase: self.! !
+
+!OOStackMixinElement methodsFor: 'associating' stamp: 'ELR 9/16/2017 13:16:07'!
+rebase: anOOStack 
+	substack:= anOOStack .! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'OOStackMixinElement class' category: #'Stack-Exercise'!
+OOStackMixinElement class
+	instanceVariableNames: ''!
+
+!OOStackMixinElement class methodsFor: 'as yet unclassified' stamp: 'ELR 9/16/2017 14:54:05'!
+asBottom
+	^ OOVoidStack new.! !
+
+!OOStackMixinElement class methodsFor: 'as yet unclassified' stamp: 'ELR 9/16/2017 15:07:43'!
+with: aString
+	^ self new store: aString.! !
+
+
+!classDefinition: #OOStack category: #'Stack-Exercise'!
+OOStackMixinElement subclass: #OOStack
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 15:20:49'!
+asBottomOf: anStack
+! !
 
 !OOStack methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:12:58'!
 size
 	^substack size! !
 
-!OOStack methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:11:15'!
+!OOStack methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 15:10:46'!
+store: String
+	^substack store: String.! !
+
+!OOStack methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 14:37:48'!
 top
-	^substack storedValue.! !
+	^substack top.! !
 
 
 !OOStack methodsFor: 'converting' stamp: 'ELR 9/15/2017 09:30:43'!
 pop
 	^substack pop.! !
 
-!OOStack methodsFor: 'converting' stamp: 'ELR 9/15/2017 09:01:13'!
-push: aString 
-	substack := OOStackElement betweenABottom: substack andATop: self with: aString .
-	! !
+!OOStack methodsFor: 'converting' stamp: 'ELR 9/16/2017 15:21:27'!
+push: aString
+	| newElement |
+	newElement _ OOStackMixinElement with: aString.
+	newElement rebase: substack.
+	newElement asBottomOf: self.
+	substack asBottomOf: newElement.
+	self rebase: newElement.! !
 
 
-!OOStack methodsFor: 'associating' stamp: 'ELR 9/15/2017 08:23:38'!
-rebase: anOOStackElement 
-	substack :=anOOStackElement .! !
+
+!OOStack methodsFor: 'creation' stamp: 'ELR 9/16/2017 15:05:45'!
+initialize
+	substack _ OOStackMixinElement asBottom.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -189,107 +259,23 @@ stackEmptyErrorDescription
 
 
 
-!classDefinition: #OOStackBottom category: #'Stack-Exercise'!
-Object subclass: #OOStackBottom
-	instanceVariableNames: 'superstack'
+!classDefinition: #OOVoidStack category: #'Stack-Exercise'!
+OOStackMixinElement subclass: #OOVoidStack
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackBottom methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 08:00:21'!
-isBottom
-	^true.! !
-
-!OOStackBottom methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:13:37'!
+!OOVoidStack methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:13:37'!
 size
 	^0.! !
 
-!OOStackBottom methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:18:40'!
-storedValue
+!OOVoidStack methodsFor: 'evaluating' stamp: 'ELR 9/16/2017 14:36:17'!
+top
 	^self error: OOStack stackEmptyErrorDescription .! !
-
-
-!OOStackBottom methodsFor: 'converting' stamp: 'ELR 9/15/2017 08:21:28'!
-of: aStack
-	superstack:=aStack.! !
-
-!OOStackBottom methodsFor: 'converting' stamp: 'ELR 9/15/2017 09:37:14'!
-pop
-	^self error: OOStack stackEmptyErrorDescription .! !
-
-!OOStackBottom methodsFor: 'converting' stamp: 'ELR 9/15/2017 09:20:57'!
-push: aStackElement 
-	superstack:=aStackElement .
-	aStackElement rebase: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OOStackBottom class' category: #'Stack-Exercise'!
-OOStackBottom class
+!classDefinition: 'OOVoidStack class' category: #'Stack-Exercise'!
+OOVoidStack class
 	instanceVariableNames: 'superstack'!
-
-!OOStackBottom class methodsFor: 'as yet unclassified' stamp: 'ELR 9/15/2017 08:20:13'!
-onBottomOf: aStack
-	| bottom |
-	bottom:= self new.
-	^bottom of: aStack .! !
-
-
-!classDefinition: #OOStackElement category: #'Stack-Exercise'!
-Object subclass: #OOStackElement
-	instanceVariableNames: 'value substack superstack'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!OOStackElement methodsFor: 'converting' stamp: 'ELR 9/15/2017 09:30:18'!
-pop
-
-	substack push: superstack .
-	
-	^value.! !
-
-
-!OOStackElement methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 08:23:57'!
-isBottom
-	^false.! !
-
-!OOStackElement methodsFor: 'evaluating' stamp: 'ELR 9/15/2017 09:13:22'!
-size
-	^substack size + 1.! !
-
-
-!OOStackElement methodsFor: 'as yet unclassified' stamp: 'ELR 9/15/2017 09:02:09'!
-store: aString betweenABottom: anOOStackBottom andATop: anOOStack 
-	value := aString .
-	superstack :=anOOStack .
-	substack :=anOOStackBottom .
-	substack push: self.! !
-
-
-!OOStackElement methodsFor: 'associating' stamp: 'ELR 9/15/2017 09:48:07'!
-push: anOOStackElement 
-     anOOStackElement rebase: self .
-	superstack := anOOStackElement .! !
-
-!OOStackElement methodsFor: 'associating' stamp: 'ELR 9/15/2017 09:21:37'!
-rebase: anOOStack 
-	substack:= anOOStack .! !
-
-
-!OOStackElement methodsFor: 'accessing' stamp: 'ELR 9/15/2017 09:07:22'!
-storedValue
-	^value.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'OOStackElement class' category: #'Stack-Exercise'!
-OOStackElement class
-	instanceVariableNames: ''!
-
-!OOStackElement class methodsFor: 'class initialization' stamp: 'ELR 9/15/2017 08:36:54'!
-betweenABottom: anOOStackBottom andATop: anOOStack with: aString 
-	| element |
-	element:= self new.
-	^element store: aString betweenABottom: anOOStackBottom andATop: anOOStack .! !
-
