@@ -403,7 +403,7 @@ balance
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: ''
+	instanceVariableNames: 'transactions aCollectionOfAccounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -414,27 +414,33 @@ balance
 	self shouldBeImplemented ! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'testing' stamp: 'yn 9/20/2017 18:47:59'!
 manages: anAccount
 
 		self shouldBeImplemented 
 ! !
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'testing' stamp: 'yn 9/20/2017 19:14:04'!
 registers: aTtransaction
 
-	self shouldBeImplemented ! !
+	^ transactions includes: aTtransaction ! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'transactions' stamp: 'yn 9/20/2017 19:16:52'!
 transactions 
 
-	self shouldBeImplemented ! !
+	^ transactions copy! !
 
 !Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:40'!
 transactionsOf: anAccount 
 
 	self shouldBeImplemented ! !
+
+
+!Portfolio methodsFor: 'initialize' stamp: 'yn 9/20/2017 19:19:33'!
+initializeCon: anAccount1 con: anAccount2
+	transactions := OrderedCollection new.
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -442,10 +448,11 @@ transactionsOf: anAccount
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'yn 9/20/2017 19:09:21'!
 with: anAccount1 with: anAccount2
 
-	self shouldBeImplemented ! !
+	^self initializeCon: anAccount1 con: anAccount2
+! !
 
 !Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
 withAll: aCollectionOfAccounts
