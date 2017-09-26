@@ -478,10 +478,11 @@ investmentNetOf: aReceptiveAccount
 	
 	^SummarizingAccount investmentNetOf: aReceptiveAccount .! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 17:02:23'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	self shouldBeImplemented ! !
+	
+	^aPortfolio portfolioTree: aDictionary.! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
@@ -522,6 +523,10 @@ transactions
 summarize
 	self subclassResponsibility .! !
 
+!SummarizingAccount methodsFor: 'as yet unclassified' stamp: 'yn 9/26/2017 17:44:12'!
+transferedAmount
+	self subclassResponsibility .! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'SummarizingAccount class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -543,181 +548,8 @@ investmentEarningsOf: aReceptiveAccount
 	^aReceptiveAccount transactions inject: 0 into:[:sum :each | sum + each investmentEarnings ].! !
 
 
-!classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
-SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: 'accounts'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 19:22'!
-manages: anAccount
-
-	^ self = anAccount  or: [ accounts anySatisfy: [ :managedAccount | managedAccount manages: anAccount  ]  ]! !
-
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 19:20'!
-registers: aTransaction
-
-	^ accounts anySatisfy: [ :anAccount | anAccount registers: aTransaction ]  ! !
-
-
-!Portfolio methodsFor: 'transactions' stamp: 'HAW 8/13/2017 17:47:44'!
-balance
-
-	^ accounts sum: [ :account | account balance ]
-! !
-
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:23'!
-transactions 
-
-	^ accounts inject: OrderedCollection new into: [ :transactions :account | transactions addAll: account transactions. transactions ]
-	! !
-
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:27'!
-transactionsOf: anAccount 
-
-	^ (self manages: anAccount)
-		ifTrue: [ anAccount transactions ] 
-		ifFalse: [ self error: self class accountNotManagedMessageDescription]
-	! !
-
-
-!Portfolio methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 19:19'!
-initializeWithAll: aCollectionOfAccounts
-
-	accounts := aCollectionOfAccounts   ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Portfolio class' category: #'PortfolioTreePrinter-Ejercicio'!
-Portfolio class
-	instanceVariableNames: ''!
-
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:48'!
-with: anAccount1 with: anAccount2
-
-	^ self withAll: (Array with: anAccount1 with: anAccount2 )! !
-
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 19:40'!
-withAll: aCollectionOfAccounts
-
-	aCollectionOfAccounts asSet size = aCollectionOfAccounts size ifFalse: [ self error: self accountAlreadyManagedErrorMessage  ].
-	
-	aCollectionOfAccounts do: [ :sourceAccount | 
-		aCollectionOfAccounts do: [ :targetAccount | 
-			(sourceAccount = targetAccount) not ifTrue: [
-				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ]]]].
-	
-	^self new initializeWithAll: aCollectionOfAccounts ! !
-
-
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
-check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts
-
-	^ aCollectionOfAccounts do: [ :targetAccount | 
-			(sourceAccount = targetAccount) not ifTrue: [ 
-				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ] ] ]! !
-
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:21'!
-checkAccountsAreUnique: aCollectionOfAccounts
-
-	aCollectionOfAccounts asSet size = aCollectionOfAccounts size
-		ifFalse: [ self error: self accountAlreadyManagedErrorMessage ]! !
-
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:21'!
-checkCreationPreconditions: aCollectionOfAccounts
-
-	self checkAccountsAreUnique: aCollectionOfAccounts.
-	self checkNoCircularReferencesIn: aCollectionOfAccounts! !
-
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
-checkNoCircularReferencesIn: aCollectionOfAccounts
-
-	aCollectionOfAccounts do: [ :sourceAccount | self check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts ]! !
-
-
-!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:28'!
-accountAlreadyManagedErrorMessage
-
-	^ 'Account already managed'! !
-
-!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:27'!
-accountNotManagedMessageDescription
-	
-	^ 'Account not managed'! !
-
-
-!classDefinition: #ReceptiveAccount category: #'PortfolioTreePrinter-Ejercicio'!
-SummarizingAccount subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:35'!
-initialize
-
-	super initialize.
-	transactions := OrderedCollection new.! !
-
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ELR 9/25/2017 21:05:20'!
-balance
-
-	^ transactions inject: 0 
-	into: [ :balance :transaction | 
-		transaction affectBalance: balance ]
-	! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-register: aTransaction
-
-	transactions add: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-transactions 
-
-	^ transactions copy! !
-
-
-!ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-manages: anAccount
-
-	^ self = anAccount 
-! !
-
-!ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-registers: aTtransaction
-
-	^ transactions includes: aTtransaction 
-! !
-
-
-!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/26/2017 11:17:40'!
-summarize
-
-	^self transactions collect: [ :transaction | transaction summarize ].! !
-
-
-!classDefinition: #Transaction category: #'PortfolioTreePrinter-Ejercicio'!
-Object subclass: #Transaction
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!Transaction methodsFor: 'as yet unclassified' stamp: 'ELR 9/26/2017 00:13:55'!
-summarize
-	self subclassResponsibility .! !
-
-!Transaction methodsFor: 'as yet unclassified' stamp: 'ELR 9/26/2017 00:23:29'!
-transferedAmount
-	self subclassResponsibility .! !
-
-
 !classDefinition: #AccountTransaction category: #'PortfolioTreePrinter-Ejercicio'!
-Transaction subclass: #AccountTransaction
+SummarizingAccount subclass: #AccountTransaction
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -860,58 +692,180 @@ register: aValue on: account
 	^ withdraw! !
 
 
-!classDefinition: #CertificateOfDeposit category: #'PortfolioTreePrinter-Ejercicio'!
-Transaction subclass: #CertificateOfDeposit
-	instanceVariableNames: 'value tna numberOfDays account'
+!classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
+SummarizingAccount subclass: #Portfolio
+	instanceVariableNames: 'accounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!CertificateOfDeposit methodsFor: 'initializing' stamp: 'ELR 9/26/2017 01:15:09'!
-investedValue
-	^value.! !
+!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 19:22'!
+manages: anAccount
 
-!CertificateOfDeposit methodsFor: 'initializing' stamp: 'ELR 9/26/2017 01:11:43'!
-register: anAmount during: days at: aTna 
-	value := anAmount .
-	numberOfDays := days.
-	tna:= aTna.! !
+	^ self = anAccount  or: [ accounts anySatisfy: [ :managedAccount | managedAccount manages: anAccount  ]  ]! !
 
+!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 19:20'!
+registers: aTransaction
 
-!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:21:14'!
-affectBalance: aBalance 
-	^aBalance - value.! !
-
-!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:25:29'!
-investmentEarnings
-	^(value*(tna/360)*numberOfDays)! !
-
-!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:28:57'!
-transferedValue
-	^0.! !
+	^ accounts anySatisfy: [ :anAccount | anAccount registers: aTransaction ]  ! !
 
 
-!CertificateOfDeposit methodsFor: 'inspecting' stamp: 'yn 9/26/2017 11:14:44'!
-summarize
-	^'Plazo fijo por ',value printString ,' durante ',numberOfDays printString ,' dias a una tna de ',(tna * 100) printString,'%'.! !
+!Portfolio methodsFor: 'transactions' stamp: 'HAW 8/13/2017 17:47:44'!
+balance
+
+	^ accounts sum: [ :account | account balance ]
+! !
+
+!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:23'!
+transactions 
+
+	^ accounts inject: OrderedCollection new into: [ :transactions :account | transactions addAll: account transactions. transactions ]
+	! !
+
+!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:27'!
+transactionsOf: anAccount 
+
+	^ (self manages: anAccount)
+		ifTrue: [ anAccount transactions ] 
+		ifFalse: [ self error: self class accountNotManagedMessageDescription]
+	! !
+
+
+!Portfolio methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 19:19'!
+initializeWithAll: aCollectionOfAccounts
+
+	accounts := aCollectionOfAccounts   ! !
+
+
+!Portfolio methodsFor: 'dictionary' stamp: 'yn 9/26/2017 17:38:40'!
+portfolioTree: aDictionary
+
+	
+	"^aDictionary collect: [ :aAccount | aAccount 'composedPortfolio' ].
+	"
+	^aDictionary at: a Portfolio .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CertificateOfDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
-CertificateOfDeposit class
+!classDefinition: 'Portfolio class' category: #'PortfolioTreePrinter-Ejercicio'!
+Portfolio class
 	instanceVariableNames: ''!
 
-!CertificateOfDeposit class methodsFor: 'creating' stamp: 'ELR 9/26/2017 01:09:51'!
-register: anAmount during: days at: tna on: aReceptiveAccount 
-	| cod |
-	cod := self new.
-	cod register: anAmount during: days at: tna.
-	aReceptiveAccount register: cod.
+!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:48'!
+with: anAccount1 with: anAccount2
+
+	^ self withAll: (Array with: anAccount1 with: anAccount2 )! !
+
+!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 19:40'!
+withAll: aCollectionOfAccounts
+
+	aCollectionOfAccounts asSet size = aCollectionOfAccounts size ifFalse: [ self error: self accountAlreadyManagedErrorMessage  ].
+	
+	aCollectionOfAccounts do: [ :sourceAccount | 
+		aCollectionOfAccounts do: [ :targetAccount | 
+			(sourceAccount = targetAccount) not ifTrue: [
+				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ]]]].
+	
+	^self new initializeWithAll: aCollectionOfAccounts ! !
+
+
+!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
+check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts
+
+	^ aCollectionOfAccounts do: [ :targetAccount | 
+			(sourceAccount = targetAccount) not ifTrue: [ 
+				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ] ] ]! !
+
+!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:21'!
+checkAccountsAreUnique: aCollectionOfAccounts
+
+	aCollectionOfAccounts asSet size = aCollectionOfAccounts size
+		ifFalse: [ self error: self accountAlreadyManagedErrorMessage ]! !
+
+!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:21'!
+checkCreationPreconditions: aCollectionOfAccounts
+
+	self checkAccountsAreUnique: aCollectionOfAccounts.
+	self checkNoCircularReferencesIn: aCollectionOfAccounts! !
+
+!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
+checkNoCircularReferencesIn: aCollectionOfAccounts
+
+	aCollectionOfAccounts do: [ :sourceAccount | self check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts ]! !
+
+
+!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:28'!
+accountAlreadyManagedErrorMessage
+
+	^ 'Account already managed'! !
+
+!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:27'!
+accountNotManagedMessageDescription
+	
+	^ 'Account not managed'! !
+
+
+!classDefinition: #ReceptiveAccount category: #'PortfolioTreePrinter-Ejercicio'!
+SummarizingAccount subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:35'!
+initialize
+
+	super initialize.
+	transactions := OrderedCollection new.! !
+
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ELR 9/25/2017 21:05:20'!
+balance
+
+	^ transactions inject: 0 
+	into: [ :balance :transaction | 
+		transaction affectBalance: balance ]
 	! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+register: aTransaction
+
+	transactions add: aTransaction 
+! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+transactions 
+
+	^ transactions copy! !
+
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+manages: anAccount
+
+	^ self = anAccount 
+! !
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+registers: aTtransaction
+
+	^ transactions includes: aTtransaction 
+! !
+
+
+!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/26/2017 11:17:40'!
+summarize
+
+	^self transactions collect: [ :transaction | transaction summarize ].! !
+
+
+!ReceptiveAccount methodsFor: 'name' stamp: 'yn 9/26/2017 17:27:25'!
+name
+
+	^name! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
-Transaction subclass: #Transfer
+SummarizingAccount subclass: #Transfer
 	instanceVariableNames: 'value sourceAccount targetAccount'
 	classVariableNames: ''
 	poolDictionaries: ''
