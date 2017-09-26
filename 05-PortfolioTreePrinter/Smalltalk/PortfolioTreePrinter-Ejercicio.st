@@ -478,16 +478,15 @@ investmentNetOf: aReceptiveAccount
 	
 	^SummarizingAccount investmentNetOf: aReceptiveAccount .! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 17:02:23'!
+!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 19:26:07'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
-	
 	
 	^aPortfolio portfolioTree: aDictionary.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 19:30:04'!
 reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	self shouldBeImplemented ! !
+	^aPortfolio reversePortfolioTree: aDictionary. ! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -521,10 +520,6 @@ transactions
 
 !SummarizingAccount methodsFor: 'as yet unclassified' stamp: 'ELR 9/25/2017 20:53:32'!
 summarize
-	self subclassResponsibility .! !
-
-!SummarizingAccount methodsFor: 'as yet unclassified' stamp: 'yn 9/26/2017 17:44:12'!
-transferedAmount
 	self subclassResponsibility .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -617,9 +612,9 @@ affectBalance: balance
 	^balance + self value .! !
 
 
-!Deposit methodsFor: 'summarizing' stamp: 'yn 9/26/2017 10:51:08'!
+!Deposit methodsFor: 'summarizing' stamp: 'ELR 9/25/2017 23:22:53'!
 summarize
-	^'Deposito por ' ,  (value asString) .! !
+	^'Deposito por ' ,  value printString .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -666,9 +661,9 @@ value
 affectBalance: balance
 	^balance - self value .! !
 
-!Withdraw methodsFor: 'affect' stamp: 'yn 9/26/2017 10:51:28'!
+!Withdraw methodsFor: 'affect' stamp: 'ELR 9/25/2017 23:10:37'!
 summarize
-	^'Extraccion por ',(value asString) .! !
+	^'Extraccion por ',value printString .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -690,6 +685,56 @@ register: aValue on: account
 	account register: withdraw.
 		
 	^ withdraw! !
+
+
+!classDefinition: #CertificateOfDeposit category: #'PortfolioTreePrinter-Ejercicio'!
+SummarizingAccount subclass: #CertificateOfDeposit
+	instanceVariableNames: 'value tna numberOfDays account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!CertificateOfDeposit methodsFor: 'initializing' stamp: 'ELR 9/26/2017 01:15:09'!
+investedValue
+	^value.! !
+
+!CertificateOfDeposit methodsFor: 'initializing' stamp: 'ELR 9/26/2017 01:11:43'!
+register: anAmount during: days at: aTna 
+	value := anAmount .
+	numberOfDays := days.
+	tna:= aTna.! !
+
+
+!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:21:14'!
+affectBalance: aBalance 
+	^aBalance - value.! !
+
+!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:25:29'!
+investmentEarnings
+	^(value*(tna/360)*numberOfDays)! !
+
+!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'ELR 9/26/2017 01:28:57'!
+transferedValue
+	^0.! !
+
+
+!CertificateOfDeposit methodsFor: 'inspecting' stamp: 'yn 9/26/2017 19:23:02'!
+summarize
+	^'Plazo fijo por ',value printString ,' durante ',numberOfDays printString ,' dias a una tna de ',(tna *100) printString ,'%'.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CertificateOfDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
+CertificateOfDeposit class
+	instanceVariableNames: ''!
+
+!CertificateOfDeposit class methodsFor: 'creating' stamp: 'ELR 9/26/2017 01:09:51'!
+register: anAmount during: days at: tna on: aReceptiveAccount 
+	| cod |
+	cod := self new.
+	cod register: anAmount during: days at: tna.
+	aReceptiveAccount register: cod.
+	! !
 
 
 !classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
@@ -737,13 +782,24 @@ initializeWithAll: aCollectionOfAccounts
 	accounts := aCollectionOfAccounts   ! !
 
 
-!Portfolio methodsFor: 'dictionary' stamp: 'yn 9/26/2017 17:38:40'!
+!Portfolio methodsFor: 'dictonaryPortfolio' stamp: 'yn 9/26/2017 19:25:14'!
 portfolioTree: aDictionary
 
-	
-	"^aDictionary collect: [ :aAccount | aAccount 'composedPortfolio' ].
-	"
-	^aDictionary at: a Portfolio .! !
+ | unaColeccion |
+	unaColeccion := OrderedCollection new.
+   aDictionary valuesDo:[:aAccount |unaColeccion add: aAccount].
+
+   ^unaColeccion! !
+
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'yn 9/26/2017 19:27:49'!
+reversePortfolioTree: aDictionary
+
+ | unaColeccion |
+	unaColeccion := OrderedCollection new.
+   aDictionary valuesDo:[:aAccount |unaColeccion add: aAccount].
+
+   ^unaColeccion! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -807,7 +863,7 @@ accountNotManagedMessageDescription
 
 !classDefinition: #ReceptiveAccount category: #'PortfolioTreePrinter-Ejercicio'!
 SummarizingAccount subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions name'
+	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -852,16 +908,19 @@ registers: aTtransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/26/2017 11:17:40'!
+!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/26/2017 19:22:38'!
 summarize
+"| output breakline |
 
+	output := ''.
+	breakline:=''.
+	self transactions do:[:each | 
+		output:=output, breakline, each summarize.
+		breakline :=' '
+		].
+	^output."
+	
 	^self transactions collect: [ :transaction | transaction summarize ].! !
-
-
-!ReceptiveAccount methodsFor: 'name' stamp: 'yn 9/26/2017 17:27:25'!
-name
-
-	^name! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
@@ -899,9 +958,9 @@ Transfer subclass: #DepositTransfer
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!DepositTransfer methodsFor: 'summarizing' stamp: 'yn 9/26/2017 10:51:17'!
+!DepositTransfer methodsFor: 'summarizing' stamp: 'ELR 9/25/2017 23:23:51'!
 summarize
-	^'Transferencia por ' , (value asString) .! !
+	^'Transferencia por ' , value printString .! !
 
 
 !DepositTransfer methodsFor: 'as yet unclassified' stamp: 'ELR 9/26/2017 00:25:34'!
@@ -941,9 +1000,9 @@ Transfer subclass: #WithdrawTransfer
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'yn 9/26/2017 10:51:34'!
+!WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'ELR 9/25/2017 23:15:20'!
 summarize
-	^'Transferencia por -' , (value asString) .! !
+	^'Transferencia por -' , value printString .! !
 
 !WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'ELR 9/26/2017 00:25:07'!
 transferedValue
