@@ -403,7 +403,7 @@ test27ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
 	self assert: 150 = (self accountTransferNetOf: fromAccount).
 	self assert: -150 = (self accountTransferNetOf: toAccount).! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/26/2011 16:29'!
+!PortfolioTest methodsFor: 'tests' stamp: 'yn 9/27/2017 17:23:40'!
 test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 
 	| account1 account2 account3 complexPortfolio composedPortfolio accountNames lines |
@@ -478,10 +478,10 @@ investmentNetOf: aReceptiveAccount
 	
 	^SummarizingAccount investmentNetOf: aReceptiveAccount .! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 19:26:07'!
+!PortfolioTest methodsFor: 'test support' stamp: 'yn 9/27/2017 17:41:32'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	^aPortfolio portfolioTree: aDictionary.! !
+	^(aPortfolio portfolioTree: aDictionary and: '') .! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'yn 9/26/2017 19:30:04'!
 reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
@@ -518,7 +518,12 @@ transactions
 	self subclassResponsibility ! !
 
 
-!SummarizingAccount methodsFor: 'as yet unclassified' stamp: 'ELR 9/25/2017 20:53:32'!
+!SummarizingAccount methodsFor: 'convertString' stamp: 'yn 9/27/2017 17:45:07'!
+portfolioTree: aDictionary and: StringsEmptys
+
+	^self subclassResponsibility! !
+
+!SummarizingAccount methodsFor: 'convertString' stamp: 'ELR 9/25/2017 20:53:32'!
 summarize
 	self subclassResponsibility .! !
 
@@ -782,24 +787,19 @@ initializeWithAll: aCollectionOfAccounts
 	accounts := aCollectionOfAccounts   ! !
 
 
-!Portfolio methodsFor: 'dictonaryPortfolio' stamp: 'yn 9/26/2017 19:25:14'!
-portfolioTree: aDictionary
+!Portfolio methodsFor: 'dictonaryPortfolio' stamp: 'yn 9/27/2017 17:44:25'!
+portfolioTree: aDictionary and: StringsEmptys
+| convertTreeACollectionString |
+	convertTreeACollectionString _ OrderedCollection new.
+	convertTreeACollectionString add: (StringsEmptys, ( aDictionary at: self )). 
+	accounts collect: [ :anAccount | convertTreeACollectionString addAll: ( anAccount portfolioTree: aDictionary and: (StringsEmptys,' ') ) ].
+	^ convertTreeACollectionString
+! !
 
- | unaColeccion |
-	unaColeccion := OrderedCollection new.
-   aDictionary valuesDo:[:aAccount |unaColeccion add: aAccount].
-
-   ^unaColeccion! !
-
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'yn 9/26/2017 19:27:49'!
+!Portfolio methodsFor: 'dictonaryPortfolio' stamp: 'yn 9/27/2017 17:41:53'!
 reversePortfolioTree: aDictionary
 
- | unaColeccion |
-	unaColeccion := OrderedCollection new.
-   aDictionary valuesDo:[:aAccount |unaColeccion add: aAccount].
-
-   ^unaColeccion! !
+	^(self portfolioTree: aDictionary and: '' )reverse .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -908,19 +908,18 @@ registers: aTtransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/26/2017 19:22:38'!
+!ReceptiveAccount methodsFor: 'wrappers' stamp: 'yn 9/27/2017 16:29:26'!
 summarize
-"| output breakline |
 
-	output := ''.
-	breakline:=''.
-	self transactions do:[:each | 
-		output:=output, breakline, each summarize.
-		breakline :=' '
-		].
-	^output."
-	
 	^self transactions collect: [ :transaction | transaction summarize ].! !
+
+
+!ReceptiveAccount methodsFor: 'accountDictionary' stamp: 'yn 9/27/2017 17:45:20'!
+portfolioTree: aDictionary and: StringsEmptys
+	| convertValueTreeACollection |
+	convertValueTreeACollection _ OrderedCollection new.
+	convertValueTreeACollection add: (StringsEmptys, ( aDictionary at: self )). 
+	^ convertValueTreeACollection! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
