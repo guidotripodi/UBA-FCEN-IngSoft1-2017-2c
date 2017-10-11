@@ -5,20 +5,21 @@ OrderedCollection subclass: #EventedFloorCollection
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!EventedFloorCollection methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:46:26'!
-errorNotFound: anObject
-	"Actually, this should raise a special Exception not just an error."
-
-	 CabinSensorEmergency signal .! !
-
-!EventedFloorCollection methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:00:55'!
-for: aController
-	master := aController .! !
-
-!EventedFloorCollection methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:34:46'!
+!EventedFloorCollection methodsFor: 'RemoveFloor' stamp: 'yn 10/11/2017 00:11:31'!
 remove: aFloor.
 	super remove: aFloor . 
 	self isEmpty ifTrue: master notifyEmpty.! !
+
+
+!EventedFloorCollection methodsFor: 'Error' stamp: 'yn 10/11/2017 00:36:17'!
+errorNotFound: anObject
+
+	 CabinSensorEmergency signal .! !
+
+
+!EventedFloorCollection methodsFor: 'create' stamp: 'yn 10/11/2017 00:13:00'!
+for: aController
+	master := aController .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -42,7 +43,7 @@ Error subclass: #ElevatorEmergency
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!ElevatorEmergency methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:45:30'!
+!ElevatorEmergency methodsFor: 'MessageError' stamp: 'ELR 10/8/2017 23:45:30'!
 messageText
 	^'Sensor de cabina desincronizado'.! !
 
@@ -54,7 +55,7 @@ ElevatorEmergency subclass: #CabinSensorEmergency
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinSensorEmergency methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:44:47'!
+!CabinSensorEmergency methodsFor: 'MessageError' stamp: 'ELR 10/8/2017 20:44:47'!
 messageText
 	^'Sensor de cabina desincronizado'! !
 
@@ -66,7 +67,7 @@ ElevatorEmergency subclass: #DoorSensorEmergency
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorSensorEmergency methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:44:17'!
+!DoorSensorEmergency methodsFor: 'MessageError' stamp: 'ELR 10/8/2017 20:44:17'!
 messageText
 	^'Sensor de puerta desincronizado'! !
 
@@ -505,33 +506,34 @@ Object subclass: #CabinMoving
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 20:54:45'!
+!CabinMoving methodsFor: 'DoorState' stamp: 'yn 10/2/2017 20:54:45'!
 doorOpen: aElevatorController
 
 	.! !
 
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:41:46'!
+!CabinMoving methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:41:46'!
 doorOpening: aCabinController 
 	.! !
 
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:47:08'!
-isMoving
-		^true .! !
 
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:45:47'!
-isStopped
-		^false .! !
-
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:58:00'!
-moving: aCabinController 
-"Dont you say..."
-	.! !
-
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:44:51'!
+!CabinMoving methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:30:53'!
 notifyEmpty: aCabinController 
 	"If the cabin is Mooving nothing can happen until it stops"! !
 
-!CabinMoving methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:06:49'!
+
+!CabinMoving methodsFor: 'State' stamp: 'yn 10/11/2017 00:31:52'!
+isMoving
+		^true .! !
+
+!CabinMoving methodsFor: 'State' stamp: 'yn 10/11/2017 00:31:23'!
+isStopped
+		^false .! !
+
+!CabinMoving methodsFor: 'State' stamp: 'yn 10/11/2017 00:31:58'!
+moving: aCabinController 
+	.! !
+
+!CabinMoving methodsFor: 'State' stamp: 'yn 10/11/2017 00:31:41'!
 stopped: aCabinController 
 	aCabinController toState: CabinStopped .! !
 
@@ -543,15 +545,15 @@ Object subclass: #CabinState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 20:53:52'!
+!CabinState methodsFor: 'DoorState' stamp: 'yn 10/2/2017 20:53:52'!
 doorOpen: aElevatorController
 	self subclassResponsibility.! !
 
-!CabinState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:19:07'!
+!CabinState methodsFor: 'DoorState' stamp: 'yn 10/2/2017 19:19:07'!
 isMoving
 		self subclassResponsibility .! !
 
-!CabinState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:19:16'!
+!CabinState methodsFor: 'DoorState' stamp: 'yn 10/2/2017 19:19:16'!
 isStopped
 		self subclassResponsibility .! !
 
@@ -563,31 +565,33 @@ CabinState subclass: #CabinStopped
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:24:52'!
+!CabinStopped methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:24:52'!
 doorOpen: aElevatorController
  aElevatorController doorOpenedFinish.! !
 
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:44:55'!
+!CabinStopped methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:44:55'!
 doorOpening: aCabinController 
 	aCabinController doorOpeningFinish .! !
 
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:21:16'!
-isMoving
-^false.! !
 
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:20:59'!
-isStopped
-^true.! !
-
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:41:03'!
-moving: aCabinController 
-	aCabinController toState: CabinMoving .! !
-
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:39:47'!
+!CabinStopped methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:29:21'!
 notifyEmpty: aCabinController 
 	aCabinController notifyStoppedAndNoMoreFloors.! !
 
-!CabinStopped methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:32:25'!
+
+!CabinStopped methodsFor: 'State' stamp: 'yn 10/11/2017 00:29:40'!
+isMoving
+^false.! !
+
+!CabinStopped methodsFor: 'State' stamp: 'yn 10/11/2017 00:29:47'!
+isStopped
+^true.! !
+
+!CabinStopped methodsFor: 'State' stamp: 'yn 10/11/2017 00:29:59'!
+moving: aCabinController 
+	aCabinController toState: CabinMoving .! !
+
+!CabinStopped methodsFor: 'State' stamp: 'yn 10/11/2017 00:29:52'!
 stopped: aCabinController 
 	.! !
 
@@ -597,35 +601,35 @@ stopped: aCabinController
 CabinStopped class
 	instanceVariableNames: ''!
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:29:14'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 03:29:14'!
 doorOpen: aCabinController 
 	aCabinController doorOpenedFinish .! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:37:44'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 03:37:44'!
 doorOpening: aCabinController 
 	aCabinController doorOpeningFinish.! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:04:09'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 01:04:09'!
 isMoving
 	^false.! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:54:10'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 03:54:10'!
 isStopped
 	^true.! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 00:57:31'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 00:57:31'!
 isStopped: aCabinController 
 	^true.! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:09:08'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 01:09:08'!
 moving
 	self shouldBeImplemented.! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:12:37'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 01:12:37'!
 moving: aCabinController 
 	aCabinController toState: CabinMoving .! !
 
-!CabinStopped class methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:42:33'!
+!CabinStopped class methodsFor: 'State' stamp: 'ELR 10/8/2017 02:42:33'!
 openCabinDoor: aCabinController 
 	aCabinController openCabinDoorFinish.! !
 
@@ -637,11 +641,11 @@ CabinState subclass: #Moving
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!Moving methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:21:37'!
+!Moving methodsFor: 'State' stamp: 'yn 10/2/2017 19:21:37'!
 isMoving
 ^true.! !
 
-!Moving methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:21:50'!
+!Moving methodsFor: 'State' stamp: 'yn 10/2/2017 19:21:50'!
 isStopped
 ^false.! !
 
@@ -653,12 +657,12 @@ Object subclass: #Controller
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!Controller methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 10:32:16'!
+!Controller methodsFor: 'State' stamp: 'ELR 10/8/2017 10:32:16'!
 for: aMasterController
 	masterController := aMasterController .
 	! !
 
-!Controller methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:16:07'!
+!Controller methodsFor: 'State' stamp: 'ELR 10/7/2017 23:16:07'!
 toState: aStateClass
 	state:= aStateClass  new.! !
 
@@ -683,89 +687,59 @@ Controller subclass: #CabinController
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:52:56'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 23:52:56'!
 doorClosed
 	floorController notifyDoorClosedRequest .
 	doorController cabinDoorClosed .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:35:08'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 14:35:08'!
 doorClosing
 	doorController cabinDoorClosing .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:21:22'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:21:22'!
 doorOpened
 	state doorOpen: self.! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:25:40'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:25:40'!
 doorOpenedFinish
 	doorController cabinDoorOpened .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:37:02'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:37:02'!
 doorOpening
 	state doorOpening: self.! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:38:19'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:38:19'!
 doorOpeningFinish
 	doorController cabinDoorOpening .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:38:31'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 14:38:31'!
 initialize
 	state := CabinStopped new .
 	floorController := FloorController for: self.
 	doorController := DoorController for: self.! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:16:42'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:16:42'!
 isDoorClose
 	^doorController isClose .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:16:19'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:16:19'!
 isDoorClosing
 	^doorController isClosing .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:12:22'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:12:22'!
 isDoorOpen
 	^doorController isOpen .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:15:56'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 03:15:56'!
 isDoorOpening
 	^doorController isOpening .! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:03:52'!
-isMoving
-	^state isMoving.! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:53:28'!
-isStopped
-	^state isStopped.! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:33:54'!
-notifyDoorOpened
-	floorController notifyDoorOpened.! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:37:00'!
-notifyEmpty
-	state notifyEmpty: self.
-	! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:37:05'!
-notifyNoMoreFloorsAndDoorsOpened.
-	masterController notifyNoMoreFloorsAndDoorsOpened.! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:10:25'!
-notifyStoppedAndNoMoreFloors
-	doorController cabinDoorOpening .
-	masterController notifyStoppedAndNoMoreFloors.! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:52:06'!
+!CabinController methodsFor: 'DoorState' stamp: 'ELR 10/8/2017 22:52:06'!
 onFloor: aFloorNumber 
 	state stopped: self.
 	floorController onFloor: aFloorNumber .
 	doorController cabinDoorOpening .
 	! !
-
-!CabinController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:32:07'!
-stopped
-	state stopped: self.! !
 
 
 !CabinController methodsFor: 'accessing' stamp: 'ELR 10/8/2017 01:39:22'!
@@ -777,10 +751,41 @@ goUpPushedFromFloor: aFloorNumber
 	floorController goUpPushedFromFloor: aFloorNumber.
 	doorController cabinDoorClosing.! !
 
-!CabinController methodsFor: 'accessing' stamp: 'ELR 10/9/2017 00:02:38'!
+!CabinController methodsFor: 'accessing' stamp: 'yn 10/11/2017 00:34:22'!
 moving
-	"doorController cabinDoorClosed" .
 	state moving: self.! !
+
+
+!CabinController methodsFor: 'State' stamp: 'yn 10/11/2017 00:32:51'!
+isMoving
+	^state isMoving.! !
+
+!CabinController methodsFor: 'State' stamp: 'yn 10/11/2017 00:33:00'!
+isStopped
+	^state isStopped.! !
+
+!CabinController methodsFor: 'State' stamp: 'yn 10/11/2017 00:33:12'!
+stopped
+	state stopped: self.! !
+
+
+!CabinController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:33:20'!
+notifyDoorOpened
+	floorController notifyDoorOpened.! !
+
+!CabinController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:33:25'!
+notifyEmpty
+	state notifyEmpty: self.
+	! !
+
+!CabinController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:33:32'!
+notifyNoMoreFloorsAndDoorsOpened.
+	masterController notifyNoMoreFloorsAndDoorsOpened.! !
+
+!CabinController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:33:44'!
+notifyStoppedAndNoMoreFloors
+	doorController cabinDoorOpening .
+	masterController notifyStoppedAndNoMoreFloors.! !
 
 
 !classDefinition: #DoorController category: #'Elevator-Ejercicio'!
@@ -790,43 +795,44 @@ Controller subclass: #DoorController
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:16:54'!
+!DoorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/7/2017 23:16:54'!
 cabinDoorClosed
 	state cabinDoorClosed: self.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:06:06'!
+!DoorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 15:06:06'!
 cabinDoorClosing
 	state cabinDoorClosing: self.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:33:11'!
+!DoorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 23:33:11'!
 cabinDoorOpened
 	state cabinDoorOpened: self.
 	masterController notifyDoorOpened.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:09:17'!
+!DoorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 02:09:17'!
 cabinDoorOpening
      state cabinDoorOpening: self.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 22:59:57'!
+
+!DoorController methodsFor: 'initialize' stamp: 'ELR 10/7/2017 22:44:02'!
+initialize
+	state:= DoorOpen new.! !
+
+
+!DoorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:26:13'!
 isClose
 	^state isClose.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:00:06'!
+!DoorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:26:20'!
 isClosing
 	^state isClosing.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 22:59:19'!
+!DoorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:26:26'!
 isOpen
 	^state isOpen.! !
 
-!DoorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:00:16'!
+!DoorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:26:31'!
 isOpening
 	^state isOpening.! !
-
-
-!DoorController methodsFor: 'nil' stamp: 'ELR 10/7/2017 22:44:02'!
-initialize
-	state:= DoorOpen new.! !
 
 
 !classDefinition: #ElevatorController category: #'Elevator-Ejercicio'!
@@ -836,139 +842,139 @@ Controller subclass: #ElevatorController
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 21:52:29'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 21:52:29'!
 cabinDoorClosed
 	cabinController doorClosed .
 	cabinController  moving.
 	
 	! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:06:21'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:06:21'!
 cabinDoorClosing
 	cabinController doorClosing.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:04:22'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 15:04:22'!
 cabinDoorOpen
      cabinController doorOpened .
 	state idle: self.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:31:40'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 22:31:40'!
 cabinDoorOpened
 	
 	cabinController stopped.
 	cabinController doorOpened .
 ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 00:46:41'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 00:46:41'!
 cabinFloorNumber
  ^cabinController floorNumber.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:15:24'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 14:15:24'!
 cabinOnFloor: floor
      cabinController onFloor: floor.
      
 ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 22:35:36'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'yn 10/11/2017 00:35:41'!
 closeCabinDoor
 	
-	"self isCabinDoorOpened ifTrue:   [ floorsToGo isEmpty ifTrue: [	state := IdleState new.] ifFalse: [state := WorkingState new.] .]  ."
 	state closeCabinDoor: self.
 
 	
 
 ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:03:21'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 15:03:21'!
 closeCabinDoorCheck
 	cabinController doorClosing .! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:15:01'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:15:01'!
 goUpPushedFromFloor: aInteger
 	cabinController goUpPushedFromFloor: aInteger.
 	state _ WorkingState new.
 	
 ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 10:34:07'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 10:34:07'!
 initialize
 	state _ IdleState new.
 	cabinController _ CabinController for: self.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:09:27'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:09:27'!
 isCabinDoorClosed
 	^cabinController isDoorClose.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:09:42'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:09:42'!
 isCabinDoorClosing
 	^cabinController isDoorClosing.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:09:55'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:09:55'!
 isCabinDoorOpened
 	^cabinController isDoorOpen.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:10:08'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:10:08'!
 isCabinDoorOpening
  	^cabinController isDoorOpening.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:03:27'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 01:03:27'!
 isCabinMoving
 	^cabinController isMoving .! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 00:52:19'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 00:52:19'!
 isCabinStopped
 	^cabinController isStopped .! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 20:15:07'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'yn 10/2/2017 20:15:07'!
 isCabinWaitingForPeople
 ^true.
 
 ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:17:45'!
-isIdle
-	^state isIdle .! !
-
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:17:56'!
-isWorking
-  	^state isWorking .! !
-
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:04:52'!
-notifyEmpty
-	state idle: self.! !
-
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:37:29'!
-notifyNoMoreFloorsAndDoorsOpened.
-	state notifyNoMoreFloorsAndDoorsOpened: self.! !
-
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:43:14'!
-notifyStoppedAndNoMoreFloors
-	state notifyStoppedAndNoMoreFloors: self.! !
-
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:47:18'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'yn 10/11/2017 00:35:51'!
 openCabinDoor
-	"self isCabinMoving  ifFalse: [self isIdle ifFalse: [doorController openingCabinDoor]	ifTrue: [doorController openCabinDoor]]."
 	state openCabinDoor: self.
 		! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:26:43'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:26:43'!
 openCabinDoorFinish
 	cabinController doorOpened.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:36:18'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:36:18'!
 openingCabinDoorCheck
 	cabinController doorOpening.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:11:11'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:11:11'!
 openingCabinDoorFinish
 	cabinController openingDoor.! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:33:10'!
+!ElevatorController methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 14:33:10'!
 waitForPeopleTimedOut
 	
 	state := WorkingState new.
 	cabinController stopped.
 	cabinController doorClosing .! !
+
+
+!ElevatorController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:20:42'!
+notifyEmpty
+	state idle: self.! !
+
+!ElevatorController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:20:52'!
+notifyNoMoreFloorsAndDoorsOpened.
+	state notifyNoMoreFloorsAndDoorsOpened: self.! !
+
+!ElevatorController methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:21:01'!
+notifyStoppedAndNoMoreFloors
+	state notifyStoppedAndNoMoreFloors: self.! !
+
+
+!ElevatorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:21:40'!
+isIdle
+	^state isIdle .! !
+
+!ElevatorController methodsFor: 'State' stamp: 'yn 10/11/2017 00:21:48'!
+isWorking
+  	^state isWorking .! !
 
 
 !classDefinition: #FloorController category: #'Elevator-Ejercicio'!
@@ -978,40 +984,41 @@ Controller subclass: #FloorController
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 01:43:44'!
+!FloorController methodsFor: 'Notify' stamp: 'ELR 10/8/2017 01:43:44'!
 floorNumber
 	^floor ! !
 
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:35:35'!
+!FloorController methodsFor: 'Notify' stamp: 'ELR 10/8/2017 20:35:35'!
 goUpPushedFromFloor: aFloorNumber 
 	
 	floor to: aFloorNumber do:[:passingFloor | floorsToGo add: passingFloor] .
 	floorsToGo remove: floor.! !
 
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 10:59:15'!
-initialize
-	floor _ 0.
-	floorsToGo _ EventedFloorCollection for: self.! !
-
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:53:38'!
+!FloorController methodsFor: 'Notify' stamp: 'ELR 10/8/2017 23:53:38'!
 notifyDoorClosedRequest
 	floorsToGo isEmpty ifTrue: [ DoorSensorEmergency signal ].! !
 
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:36:28'!
+!FloorController methodsFor: 'Notify' stamp: 'ELR 10/8/2017 23:36:28'!
 notifyDoorOpened.
 	floorsToGo isEmpty ifTrue: [masterController notifyNoMoreFloorsAndDoorsOpened].! !
 
-!FloorController methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 11:04:50'!
+!FloorController methodsFor: 'Notify' stamp: 'ELR 10/8/2017 11:04:50'!
 notifyEmpty
 	masterController notifyEmpty.! !
 
 
-!FloorController methodsFor: 'accessing' stamp: 'ELR 10/9/2017 00:04:59'!
+!FloorController methodsFor: 'accessing' stamp: 'yn 10/11/2017 00:09:28'!
 onFloor: aFloorNumber 
-     "This IF is propper of the functionality of the controller, it doesn't let to change to other Floor that isn't consecutive."
+    
 	((floor = (aFloorNumber -1) ) or: (floor = (aFloorNumber +1) )) ifFalse: [CabinSensorEmergency signal].
 	floorsToGo remove: aFloorNumber .
 	floor:=aFloorNumber .! !
+
+
+!FloorController methodsFor: 'initialize' stamp: 'yn 10/11/2017 00:19:31'!
+initialize
+	floor _ 0.
+	floorsToGo _ EventedFloorCollection for: self.! !
 
 
 !classDefinition: #DoorState category: #'Elevator-Ejercicio'!
@@ -1021,24 +1028,24 @@ Object subclass: #DoorState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorState methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 21:22:05'!
+!DoorState methodsFor: 'StateDoor' stamp: 'ELR 10/7/2017 21:22:05'!
 closeCabinDoor: aElevatorController
 	self subclassResponsibility .
 ! !
 
-!DoorState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:31:07'!
+!DoorState methodsFor: 'StateDoor' stamp: 'yn 10/2/2017 19:31:07'!
 isClose
 	^self subclassResponsibility.! !
 
-!DoorState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:31:19'!
+!DoorState methodsFor: 'StateDoor' stamp: 'yn 10/2/2017 19:31:19'!
 isClosing
 	^self subclassResponsibility.! !
 
-!DoorState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:31:29'!
+!DoorState methodsFor: 'StateDoor' stamp: 'yn 10/2/2017 19:31:29'!
 isOpen
 	^self subclassResponsibility.! !
 
-!DoorState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:31:45'!
+!DoorState methodsFor: 'StateDoor' stamp: 'yn 10/2/2017 19:31:45'!
 isOpening
 	^self subclassResponsibility.! !
 
@@ -1050,45 +1057,46 @@ DoorState subclass: #DoorClosed
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:56:12'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/8/2017 23:56:12'!
 cabinDoorClosed: aDoorController 
 	DoorSensorEmergency signal.! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:10:25'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/8/2017 15:10:25'!
 cabinDoorClosing: aDoorController 
 	 .! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:33:54'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/7/2017 23:33:54'!
 cabinDoorOpened: aController
 	aController toState: DoorOpen .! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:14:12'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/8/2017 02:14:12'!
 cabinDoorOpening: aDoorController 
 	aDoorController toState: DoorOpening .! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 21:25:28'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/7/2017 21:25:28'!
 closeCabinDoor: anElevatorController 
 	.! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:12:50'!
+!DoorClosed methodsFor: 'CabinDoorState' stamp: 'ELR 10/8/2017 02:58:52'!
+openingCabinDoor: aDoorController 
+	aDoorController toState: DoorOpening .! !
+
+
+!DoorClosed methodsFor: 'State' stamp: 'yn 10/11/2017 00:28:27'!
 isClose
 ^true.! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:12:11'!
+!DoorClosed methodsFor: 'State' stamp: 'yn 10/11/2017 00:28:35'!
 isClosing
 ^false.! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:13:00'!
+!DoorClosed methodsFor: 'State' stamp: 'yn 10/11/2017 00:28:40'!
 isOpen
 ^false.! !
 
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:12:11'!
+!DoorClosed methodsFor: 'State' stamp: 'yn 10/11/2017 00:28:46'!
 isOpening
 ^false.! !
-
-!DoorClosed methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:58:52'!
-openingCabinDoor: aDoorController 
-	aDoorController toState: DoorOpening .! !
 
 
 !classDefinition: #DoorClosing category: #'Elevator-Ejercicio'!
@@ -1098,35 +1106,36 @@ DoorState subclass: #DoorClosing
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:32:37'!
+!DoorClosing methodsFor: 'DoorCabinState' stamp: 'ELR 10/7/2017 23:32:37'!
 cabinDoorClosed: aDoorController 
 	aDoorController toState: DoorClosed .! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:47:29'!
+!DoorClosing methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 20:47:29'!
 cabinDoorClosing: aDoorController 
 	.! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:33:39'!
+!DoorClosing methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:33:39'!
 cabinDoorOpened: aDoorController 
 	aDoorController  toState: DoorOpen .! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:40:07'!
+!DoorClosing methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:40:07'!
 cabinDoorOpening: aDoorController 
 	aDoorController toState: DoorOpening .! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:12:23'!
+
+!DoorClosing methodsFor: 'State' stamp: 'yn 10/11/2017 00:27:12'!
 isClose
 ^false.! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:13:12'!
+!DoorClosing methodsFor: 'State' stamp: 'yn 10/11/2017 00:27:25'!
 isClosing
 ^true.! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:13:19'!
+!DoorClosing methodsFor: 'State' stamp: 'yn 10/11/2017 00:27:18'!
 isOpen
 ^false.! !
 
-!DoorClosing methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:12:23'!
+!DoorClosing methodsFor: 'State' stamp: 'yn 10/11/2017 00:27:32'!
 isOpening
 ^false.! !
 
@@ -1138,41 +1147,38 @@ DoorState subclass: #DoorOpen
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:10:46'!
+!DoorOpen methodsFor: 'DoorCabinState' stamp: 'ELR 10/7/2017 23:10:46'!
 cabinDoorClosed: aController
 	aController toState: DoorClosed.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:32:01'!
+!DoorOpen methodsFor: 'DoorCabinState' stamp: 'ELR 10/7/2017 23:32:01'!
 cabinDoorClosing: aDoorController 
 	aDoorController  toState: DoorClosing .! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:37:00'!
+!DoorOpen methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 02:37:00'!
 cabinDoorOpened: aDoorController 
 	.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:10:13'!
+!DoorOpen methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 02:10:13'!
 cabinDoorOpening: aDoorController 
 	.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:11:04'!
+
+!DoorOpen methodsFor: 'State' stamp: 'yn 10/11/2017 00:24:48'!
 isClose
 ^false.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:11:11'!
+!DoorOpen methodsFor: 'State' stamp: 'yn 10/11/2017 00:24:55'!
 isClosing
 ^false.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:10:54'!
+!DoorOpen methodsFor: 'State' stamp: 'yn 10/11/2017 00:25:04'!
 isOpen
 ^true.! !
 
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:11:19'!
+!DoorOpen methodsFor: 'State' stamp: 'yn 10/11/2017 00:25:10'!
 isOpening
 ^false.! !
-
-!DoorOpen methodsFor: 'as yet unclassified' stamp: 'ELR 10/7/2017 23:03:27'!
-self
-	self shouldBeImplemented.! !
 
 
 !classDefinition: #DoorOpening category: #'Elevator-Ejercicio'!
@@ -1182,35 +1188,36 @@ DoorState subclass: #DoorOpening
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:30:48'!
+!DoorOpening methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 15:30:48'!
 cabinDoorClose: aDoorController 
 	 .! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 15:33:20'!
+!DoorOpening methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 15:33:20'!
 cabinDoorClosing: aDoorController 
 	 .! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:17:55'!
+!DoorOpening methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 02:17:55'!
 cabinDoorOpened: aDoorController 
 	aDoorController  toState: DoorOpen .! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 03:55:33'!
+!DoorOpening methodsFor: 'DoorCabinState' stamp: 'ELR 10/8/2017 03:55:33'!
 cabinDoorOpening: anElevatorController 
 	.! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:15:45'!
+
+!DoorOpening methodsFor: 'State' stamp: 'yn 10/11/2017 00:23:35'!
 isClose
 	^false.! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:08:32'!
+!DoorOpening methodsFor: 'State' stamp: 'yn 10/11/2017 00:23:42'!
 isClosing
 	^false.! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:56:32'!
+!DoorOpening methodsFor: 'State' stamp: 'yn 10/11/2017 00:23:55'!
 isOpen
 	^false.! !
 
-!DoorOpening methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 19:08:44'!
+!DoorOpening methodsFor: 'State' stamp: 'yn 10/11/2017 00:23:48'!
 isOpening
 	^true.! !
 
@@ -1222,11 +1229,11 @@ Object subclass: #State
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!State methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:42:27'!
+!State methodsFor: 'State' stamp: 'yn 10/2/2017 18:42:27'!
 isIdle
 		self subclassResponsibility .! !
 
-!State methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:42:44'!
+!State methodsFor: 'State' stamp: 'yn 10/2/2017 18:42:44'!
 isWorking
 		self subclassResponsibility .! !
 
@@ -1238,34 +1245,35 @@ State subclass: #IdleState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:30:46'!
+!IdleState methodsFor: 'CabinDoor' stamp: 'ELR 10/8/2017 23:30:46'!
 closeCabinDoor: aElevatorController
 	.! !
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:16:03'!
+!IdleState methodsFor: 'CabinDoor' stamp: 'ELR 10/8/2017 02:51:58'!
+openCabinDoor: anElevatorController 
+	anElevatorController openCabinDoorFinish .! !
+
+
+!IdleState methodsFor: 'State' stamp: 'yn 10/11/2017 00:17:14'!
 idle: controller
 	.! !
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:47:00'!
+!IdleState methodsFor: 'State' stamp: 'yn 10/11/2017 00:17:23'!
 isIdle
 	^true.! !
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:47:14'!
+!IdleState methodsFor: 'State' stamp: 'yn 10/11/2017 00:17:35'!
 isWorking
 	^false.! !
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:39:24'!
+
+!IdleState methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:36:34'!
 notifyNoMoreFloorsAndDoorsOpened: anElevatorController 
-	"Nothing to do here"! !
+! !
 
-!IdleState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:03:14'!
+!IdleState methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:36:41'!
 notifyStoppedAndNoMoreFloors: anElevatorController 
-	"Doors are opening thus im working"
 	anElevatorController toState: WorkingState .! !
-
-!IdleState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:51:58'!
-openCabinDoor: anElevatorController 
-	anElevatorController openCabinDoorFinish .! !
 
 
 !classDefinition: #WorkingState category: #'Elevator-Ejercicio'!
@@ -1275,33 +1283,35 @@ State subclass: #WorkingState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 14:59:19'!
-closeCabinDoor: anElevatorController
-	anElevatorController closeCabinDoorCheck.
-	! !
-
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 02:34:24'!
+!WorkingState methodsFor: 'State' stamp: 'yn 10/11/2017 00:14:04'!
 idle: elevatorController.
 	elevatorController  toState: IdleState .
 	! !
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:45:06'!
+!WorkingState methodsFor: 'State' stamp: 'yn 10/11/2017 00:13:49'!
 isIdle
 	^false.! !
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 18:44:28'!
+!WorkingState methodsFor: 'State' stamp: 'yn 10/11/2017 00:13:57'!
 isWorking
 	^true.! !
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 23:38:22'!
+
+!WorkingState methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:14:23'!
 notifyNoMoreFloorsAndDoorsOpened: aController
 	aController toState: IdleState .
 	! !
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 22:52:56'!
+!WorkingState methodsFor: 'Notify' stamp: 'yn 10/11/2017 00:36:59'!
 notifyStoppedAndNoMoreFloors: anElevatorController 
-	"Nothing to do until doors are completly opened"! !
+! !
 
-!WorkingState methodsFor: 'as yet unclassified' stamp: 'ELR 10/8/2017 20:55:54'!
+
+!WorkingState methodsFor: 'CabinDoor' stamp: 'yn 10/11/2017 00:15:13'!
+closeCabinDoor: anElevatorController
+	anElevatorController closeCabinDoorCheck.
+	! !
+
+!WorkingState methodsFor: 'CabinDoor' stamp: 'yn 10/11/2017 00:15:20'!
 openCabinDoor: anElevatorController 
 	anElevatorController openingCabinDoorCheck.! !
