@@ -538,14 +538,14 @@ setUp
 
 !classDefinition: #Cabin category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Cabin
-	instanceVariableNames: 'elevator state door motor currentFloorNumber'
+	instanceVariableNames: 'elevator state door motor currentFloorNumber visitors'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Cabin methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:26'!
+!Cabin methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:31:24'!
 initializeOf: anElevator
-
+	visitors:= OrderedCollection new.
 	elevator := anElevator.
 	door := CabinDoor of: self.
 	motor := Motor new.
@@ -568,20 +568,23 @@ waitForPeople
 ! !
 
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:24'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:41:58'!
 makeMoving
 	
-	state := CabinMovingState for: self! !
+	state := CabinMovingState for: self.
+	visitors do: [:each | state accept: each] .! !
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:31'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:41:48'!
 makeStopped
 	
-	state := CabinStoppedState for: self! !
+	state := CabinStoppedState for: self.
+	visitors do: [:each | state accept: each] .! !
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:37'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:42:03'!
 makeWaitingForPeople
 	
-	state := CabinWaitingForPeopleState for: self! !
+	state := CabinWaitingForPeopleState for: self.
+	visitors do: [:each | state accept: each] .! !
 
 
 !Cabin methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 16:47:02'!
@@ -708,6 +711,17 @@ door
 
 	^door! !
 
+
+!Cabin methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:27:39'!
+accept: aVisitor 
+	door accept: aVisitor .
+	visitors add: aVisitor .
+	! !
+
+!Cabin methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:28:35'!
+visitors
+	^visitors .! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cabin class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -728,14 +742,14 @@ sensorDesincronizedErrorMessage
 
 !classDefinition: #CabinDoor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #CabinDoor
-	instanceVariableNames: 'cabin state motor'
+	instanceVariableNames: 'cabin state motor visitors'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoor methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:32'!
+!CabinDoor methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:30:52'!
 initializeOf: aCabin
-
+	visitors:= OrderedCollection  new.
 	cabin := aCabin.
 	motor := Motor new.
 	state :=CabinDoorOpenedState for: self! !
@@ -866,25 +880,29 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:14:46'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:37'!
 makeClosed
 	
-	state := CabinDoorClosedState for: self! !
+	state := CabinDoorClosedState for: self.
+	visitors do: [:each | state accept: each] .! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:14:54'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:46'!
 makeClosing
 	
-	state := CabinDoorClosingState for: self! !
+	state := CabinDoorClosingState for: self.
+	visitors do: [:each | state accept: each] .! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:02'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:51'!
 makeOpened
 	
-	state := CabinDoorOpenedState for: self! !
+	state := CabinDoorOpenedState for: self.
+	visitors do: [:each | state accept: each] .! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:09'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:55'!
 makeOpening
 	
-	state := CabinDoorOpeningState for: self! !
+	state := CabinDoorOpeningState for: self.
+	visitors do: [:each | state accept: each] .! !
 
 
 !CabinDoor methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:30'!
@@ -896,6 +914,16 @@ sensorDesincronizedErrorMessage
 signalSensorDesincronized
 	
 	self error: self sensorDesincronizedErrorMessage! !
+
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:38:03'!
+accept: aVisitor
+	state accept: aVisitor .
+	visitors add: aVisitor.! !
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:28:12'!
+visitors
+	^visitors.	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -922,10 +950,11 @@ Object subclass: #CabinDoorState
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoorState methodsFor: 'initialization' stamp: 'HAW 10/3/2017 16:42:05'!
+!CabinDoorState methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:15:53'!
 initializeFor: aCabinDoor
 
-	door := aCabinDoor ! !
+	door := aCabinDoor .
+	! !
 
 
 !CabinDoorState methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 20:25:19'!
@@ -1018,10 +1047,10 @@ open
 	^door openWhenClosed! !
 
 
-!CabinDoorClosedState methodsFor: 'visitor' stamp: 'HAW 10/4/2017 14:06:38'!
-accept: aVisitor
+!CabinDoorClosedState methodsFor: 'visitor' stamp: 'ELR 10/12/2017 20:35:40'!
+accept: visitor
 
-	aVisitor visitCabinDoorClosed: self! !
+	visitor visitCabinDoorClosed: self.! !
 
 
 !classDefinition: #CabinDoorClosingState category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -1168,6 +1197,11 @@ Object subclass: #CabinState
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+
+!CabinState methodsFor: 'as yet unclassified' stamp: 'yn 10/2/2017 20:53:52'!
+doorOpen: aElevatorController
+	self subclassResponsibility.! !
+
 
 !CabinState methodsFor: 'initialization' stamp: 'HAW 10/3/2017 15:53:27'!
 initializeFor: aCabin
@@ -1324,14 +1358,14 @@ accept: aVisitor
 
 !classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Elevator
-	instanceVariableNames: 'cabin state floorsToGo'
+	instanceVariableNames: 'cabin state floorsToGo visitors'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'HAW 10/3/2017 16:12:07'!
+!Elevator methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:26:56'!
 initialize
-
+	visitors := OrderedCollection new.
 	cabin := Cabin of: self.
 	floorsToGo := SortedCollection new.
 	state := ElevatorIdleState for: self.
@@ -1414,6 +1448,13 @@ cabin
 	
 	^cabin! !
 
+
+!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:26:18'!
+accept: aVisitor 
+	cabin accept: aVisitor .
+	visitors add: aVisitor
+! !
+
 
 !classDefinition: #ElevatorConsole category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #ElevatorConsole
@@ -1422,10 +1463,11 @@ Object subclass: #ElevatorConsole
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorConsole methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:16:02'!
+!ElevatorConsole methodsFor: 'initialization' stamp: 'ELR 10/12/2017 19:06:26'!
 initializeOf: anElevator
 	
 	stream := WriteStream on: String new.
+	anElevator accept: self.
 ! !
 
 
@@ -1587,9 +1629,10 @@ Object subclass: #ElevatorStatusView
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorStatusView methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:16:11'!
+!ElevatorStatusView methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:44:51'!
 initializeOf: anElevator
-! !
+
+	anElevator accept: self.! !
 
 
 !ElevatorStatusView methodsFor: 'accessing' stamp: 'HAW 10/4/2017 12:41:24'!
