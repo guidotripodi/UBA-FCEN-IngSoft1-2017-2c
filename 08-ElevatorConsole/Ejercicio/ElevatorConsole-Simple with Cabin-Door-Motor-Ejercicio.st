@@ -527,7 +527,7 @@ test04ElevatorControllerCanHaveMoreThanOneView
 	self assert: 'Stopped' = elevatorStatusView cabinFieldModel.
 	self assert: 'Opening' = elevatorStatusView cabinDoorFieldModel! !
 
-!ElevatorViewTest methodsFor: 'testing' stamp: 'yn 10/18/2017 00:15:21'!
+!ElevatorViewTest methodsFor: 'testing' stamp: 'ELR 10/18/2017 14:31:13'!
 test05ElevatorStatusViewOpenedCabin
 	| elevatorConsole elevatorStatusView readStream |
 	
@@ -537,7 +537,8 @@ test05ElevatorStatusViewOpenedCabin
 	elevator goUpPushedFromFloor: 1.
 	door closed.
 	cabin onFloor: 1.  
-		
+	door opened.
+	
 	readStream := elevatorConsole consoleReadStream.
 
 	self assert: 'Puerta Cerrandose' = readStream nextLine.
@@ -551,45 +552,43 @@ test05ElevatorStatusViewOpenedCabin
 "
 
 	self assert: 'Stopped' = elevatorStatusView cabinFieldModel.
-	self assert: 'Opening' = elevatorStatusView cabinDoorFieldModel.
-	door opened.
+	self assert: 'Opened' = elevatorStatusView cabinDoorFieldModel.
+	
 	self assert: 'Opened' = elevatorStatusView cabinDoorFieldModel.
 	self assert: 'Puerta Abierta' = readStream nextLine.
 	self assert: readStream atEnd.
 	! !
 
-!ElevatorViewTest methodsFor: 'testing' stamp: 'yn 10/18/2017 00:21:29'!
+!ElevatorViewTest methodsFor: 'testing' stamp: 'ELR 10/18/2017 15:03:25'!
 test06ElevatorStatusViewOpenedCabinWaitingPeople
 	| elevatorConsole elevatorStatusView readStream |
 	
 	elevatorConsole := ElevatorConsole of: elevator.
 	elevatorStatusView := ElevatorStatusView of: elevator.
 		
+
 	elevator goUpPushedFromFloor: 1.
+	self assert: 'Closing' = elevatorStatusView cabinDoorFieldModel.
 	door closed.
 	self assert: 'Closed' = elevatorStatusView cabinDoorFieldModel.
 	cabin onFloor: 1.  
-		
+	door opened.
+	self assert: 'Opened' = elevatorStatusView cabinDoorFieldModel.
+	self assert: 'Stopped' = elevatorStatusView cabinFieldModel.
+	cabin waitForPeople.
+	self assert: 'Waiting for People' = elevatorStatusView cabinFieldModel.
+	
+	
 	readStream := elevatorConsole consoleReadStream.
-"
+
 	self assert: 'Puerta Cerrandose' = readStream nextLine.
 	self assert: 'Puerta Cerrada' = readStream nextLine.
 	self assert: 'Cabina Moviendose' = readStream nextLine.
 	self assert: 'Cabina Detenida' = readStream nextLine.
 	self assert: 'Puerta Abriendose' = readStream nextLine.
-	door opened.
 	self assert: 'Puerta Abierta' = readStream nextLine.
-	self assert: readStream atEnd.
-Closed
-"
-	self assert: 'Stopped' = elevatorStatusView cabinFieldModel.
-	self assert: 'Opening' = elevatorStatusView cabinDoorFieldModel.
-	door opened.
-	self assert: 'Opened' = elevatorStatusView cabinDoorFieldModel.
-	cabin waitForPeople.
-	self assert: 'Waiting for People' = readStream nextLine.
-	
-	! !
+	self assert: 'Esperando personas' = readStream nextLine.
+	self assert: readStream atEnd.! !
 
 !ElevatorViewTest methodsFor: 'testing' stamp: 'yn 10/18/2017 00:19:04'!
 test07ElevatorStatusViewCabinClosed
@@ -876,10 +875,6 @@ accept: aVisitor
 	visitors add: aVisitor .
 	! !
 
-!Cabin methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:28:35'!
-visitors
-	^visitors .! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cabin class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -1075,14 +1070,10 @@ signalSensorDesincronized
 	self error: self sensorDesincronizedErrorMessage! !
 
 
-!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:38:03'!
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 15:00:18'!
 accept: aVisitor
-	state accept: aVisitor .
+	"state accept: aVisitor ."
 	visitors add: aVisitor.! !
-
-!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:28:12'!
-visitors
-	^visitors.	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1542,9 +1533,8 @@ Object subclass: #Elevator
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:26:56'!
+!Elevator methodsFor: 'initialization' stamp: 'ELR 10/18/2017 13:43:20'!
 initialize
-	visitors := OrderedCollection new.
 	cabin := Cabin of: self.
 	floorsToGo := SortedCollection new.
 	state := ElevatorIdleState for: self.
@@ -1628,10 +1618,9 @@ cabin
 	^cabin! !
 
 
-!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:26:18'!
+!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 13:43:06'!
 accept: aVisitor 
 	cabin accept: aVisitor .
-	visitors add: aVisitor
 ! !
 
 
@@ -1670,10 +1659,12 @@ visitCabinDoorClosing: aCabinDoorClosingState
 		nextPutAll: 'Puerta Cerrandose';
 		newLine! !
 
-!ElevatorConsole methodsFor: 'visiting' stamp: 'yn 10/18/2017 00:16:27'!
+!ElevatorConsole methodsFor: 'visiting' stamp: 'ELR 10/18/2017 14:00:03'!
 visitCabinDoorOpened: aCabinDoorOpenedState 
 
-! !
+	stream 
+		nextPutAll: 'Puerta Abierta'  ;
+		newLine! !
 
 !ElevatorConsole methodsFor: 'visiting' stamp: 'HAW 10/4/2017 14:08:27'!
 visitCabinDoorOpening: aCabinDoorOpeningState 
