@@ -700,9 +700,8 @@ Object subclass: #Cabin
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Cabin methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:31:24'!
+!Cabin methodsFor: 'initialization' stamp: 'ELR 10/18/2017 19:41:50'!
 initializeOf: anElevator
-	visitors:= OrderedCollection new.
 	elevator := anElevator.
 	door := CabinDoor of: self.
 	motor := Motor new.
@@ -725,23 +724,23 @@ waitForPeople
 ! !
 
 
-!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:41:58'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:45:00'!
 makeMoving
 	
 	state := CabinMovingState for: self.
-	visitors do: [:each | state accept: each] .! !
+	elevator notify: state.! !
 
-!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:41:48'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:45:17'!
 makeStopped
 	
 	state := CabinStoppedState for: self.
-	visitors do: [:each | state accept: each] .! !
+	elevator notify: state.! !
 
-!Cabin methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:42:03'!
+!Cabin methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:45:25'!
 makeWaitingForPeople
 	
 	state := CabinWaitingForPeopleState for: self.
-	visitors do: [:each | state accept: each] .! !
+	elevator notify: state.! !
 
 
 !Cabin methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 16:47:02'!
@@ -764,6 +763,10 @@ waitForPeopleTimedOut
 currentFloorNumber
 
 	^currentFloorNumber! !
+
+!Cabin methodsFor: 'floor' stamp: 'ELR 10/18/2017 19:29:49'!
+notify: aState
+	elevator notify: aState.! !
 
 !Cabin methodsFor: 'floor' stamp: 'HAW 10/4/2017 10:30:50'!
 reachedFloorToStop
@@ -868,13 +871,6 @@ door
 
 	^door! !
 
-
-!Cabin methodsFor: 'as yet unclassified' stamp: 'ELR 10/12/2017 20:27:39'!
-accept: aVisitor 
-	door accept: aVisitor .
-	visitors add: aVisitor .
-	! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cabin class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -900,9 +896,8 @@ Object subclass: #CabinDoor
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoor methodsFor: 'initialization' stamp: 'ELR 10/12/2017 20:30:52'!
+!CabinDoor methodsFor: 'initialization' stamp: 'ELR 10/18/2017 19:42:06'!
 initializeOf: aCabin
-	visitors:= OrderedCollection  new.
 	cabin := aCabin.
 	motor := Motor new.
 	state :=CabinDoorOpenedState for: self! !
@@ -1034,29 +1029,29 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:37'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:40:16'!
 makeClosed
 	
 	state := CabinDoorClosedState for: self.
-	visitors do: [:each | state accept: each] .! !
+	cabin notify: state.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:46'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:46:27'!
 makeClosing
 	
 	state := CabinDoorClosingState for: self.
-	visitors do: [:each | state accept: each] .! !
+	cabin notify: state.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:51'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:46:39'!
 makeOpened
 	
 	state := CabinDoorOpenedState for: self.
-	visitors do: [:each | state accept: each] .! !
+	cabin notify: state.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/12/2017 20:39:55'!
+!CabinDoor methodsFor: 'state change' stamp: 'ELR 10/18/2017 19:46:47'!
 makeOpening
 	
 	state := CabinDoorOpeningState for: self.
-	visitors do: [:each | state accept: each] .! !
+	cabin notify: state.! !
 
 
 !CabinDoor methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:30'!
@@ -1070,10 +1065,10 @@ signalSensorDesincronized
 	self error: self sensorDesincronizedErrorMessage! !
 
 
-!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 15:00:18'!
-accept: aVisitor
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:29:01'!
+notify: aState
 	"state accept: aVisitor ."
-	visitors add: aVisitor.! !
+	cabin notify: aState .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1528,16 +1523,17 @@ accept: aVisitor
 
 !classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Elevator
-	instanceVariableNames: 'cabin state floorsToGo visitors'
+	instanceVariableNames: 'cabin state floorsToGo visitors notifier'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'ELR 10/18/2017 13:43:20'!
+!Elevator methodsFor: 'initialization' stamp: 'ELR 10/18/2017 19:25:49'!
 initialize
 	cabin := Cabin of: self.
 	floorsToGo := SortedCollection new.
 	state := ElevatorIdleState for: self.
+	notifier := Notifier new.
 	! !
 
 
@@ -1618,10 +1614,13 @@ cabin
 	^cabin! !
 
 
-!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 13:43:06'!
+!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:27:46'!
 accept: aVisitor 
-	cabin accept: aVisitor .
-! !
+	notifier addObserver: aVisitor.! !
+
+!Elevator methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:27:35'!
+notify: aState 
+	notifier notify: aState.! !
 
 
 !classDefinition: #ElevatorConsole category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -1947,3 +1946,23 @@ Motor class
 motorMustBeStoppedBeforeMovingAgainErrorMessage
 
 	^'El motor debe estar parado antes de que se empiece a mover'! !
+
+
+!classDefinition: #Notifier category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Object subclass: #Notifier
+	instanceVariableNames: 'observers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+
+!Notifier methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:43:33'!
+addObserver: aObserver
+	observers add: aObserver.! !
+
+!Notifier methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:41:29'!
+initialize
+	observers:= OrderedCollection  new.! !
+
+!Notifier methodsFor: 'as yet unclassified' stamp: 'ELR 10/18/2017 19:40:47'!
+notify: aState
+	observers do: [:each |aState accept: each] .! !
