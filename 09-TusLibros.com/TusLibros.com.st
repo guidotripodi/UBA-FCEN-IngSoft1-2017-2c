@@ -147,8 +147,51 @@ test12CashierRejectsEmptyCart
 		withExceptionDo: [ :anError | 
 			self assert: anError  messageText = Cashier CashierEmptyCartErrorDescription ].! !
 
-!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:36:49'!
-test13CheckOut
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:03:03'!
+test13ListItemsCart
+	| aCatalog editorial aCart listItems product product2 |
+	editorial _ Editorial withName: 'Yenny'.
+	aCatalog _ OrderedCollection new.
+	aCart _ Cart fromEditorial: editorial.
+	product := 4356.
+	product2  := 8741.
+	editorial add: product withPrice: 5 .
+	editorial add: product2 withPrice: 1 .
+	aCatalog add: product.
+	aCatalog add: product2.
+	aCart add: product copies: 2.
+	aCart add: product2 copies: 6.
+	aCart add: product copies: 3.
+	
+	listItems := aCart listItemsWithQuantities.
+	self deny: listItems isEmpty.
+	self assert:  [listItems includes: {product.5}].
+	self assert:  [listItems includes: {product2.6}].
+	
+
+! !
+
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:29:10'!
+test14CashierCalculatesTotal
+
+	| cart editorialCatalogue cashier editorial product product2 |
+	editorial _ Editorial withName: 'Yenny'.
+	editorialCatalogue := Dictionary new.
+
+	product := 4356.
+	product2 := 1234.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	cashier := Cashier from: editorial.
+	cashier withPricesCatalogue: editorial catalog.
+	cart := Cart fromEditorial: editorial .
+	cart add: product copies: 3.
+	cart add: product2 copies: 3.
+	self assert: (cashier assess: cart) = 1266.
+	! !
+
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 21:47:16'!
+test15CheckOut
 
 	| cart  creditCard editorial cashier numberCard owner toMonth toYear product |
 	editorial := Editorial withName: 'Yenny'.
@@ -204,6 +247,18 @@ initialize
 isEmpty
 	^products size = 0.! !
 
+!Cart methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 21:50:55'!
+listItemsWithQuantities
+	|listOfItems|
+	
+	listOfItems := OrderedCollection new.
+	
+	(products asSet) do: [ :item | 
+		listOfItems add: { item. (products occurrencesOf: item) }. ].
+	
+	^listOfItems.
+! !
+
 !Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:23:59'!
 products
 	^products! !
@@ -232,7 +287,7 @@ invalidProductErrorDescription
 
 !classDefinition: #Cashier category: #'TusLibros.com'!
 Object subclass: #Cashier
-	instanceVariableNames: 'editorial'
+	instanceVariableNames: 'editorial catalog total'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -244,7 +299,7 @@ assess: aCart
 	aCart products do:[:each | bill:= bill + (editorial priceFor: each)].
 	^bill.! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:08:27'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:25:23'!
 checkout: aCart using: aCreditCard 
 	
 	| cart creditCard |
@@ -255,11 +310,18 @@ checkout: aCart using: aCreditCard
 		ifTrue: [ ^self error: Cashier CashierEmptyCartErrorDescription  ].
 		
 	creditCard isExpired 
-		ifTrue: [ ^self error: Cashier invalidCreditCardErrorDescription  ].! !
+		ifTrue: [ ^self error: Cashier invalidCreditCardErrorDescription  ].
+		
+		total _ self assess: cart.! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:02:44'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:15:31'!
 editorial: anEditorial 
-	editorial _ anEditorial .! !
+	editorial _ anEditorial .
+	catalog = Dictionary new.! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:25:53'!
+totalCart
+	^total.! !
 
 !Cashier methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:44:26'!
 useCreditCard: card
@@ -270,6 +332,10 @@ useCreditCard: card
 	card year >= yearNow ifTrue: [ card year = yearNow ifTrue: [card month < monthNow ifTrue: [self error: Cashier invalidCreditCardErrorDescription ]] ] ifFalse: [self error: Cashier invalidCreditCardErrorDescription ] 
 	
 	! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:14:42'!
+withPricesCatalogue: aCatalog 
+	catalog _ aCatalog .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -378,6 +444,10 @@ add: anProduct
 add: aProduct withPrice: aPrice 
 	self add: aProduct .
 	catalog at: aProduct put: aPrice.! !
+
+!Editorial methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:13:31'!
+catalog
+	^catalog.! !
 
 !Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:06:48'!
 employ: aCashier 
