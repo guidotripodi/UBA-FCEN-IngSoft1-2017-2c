@@ -361,6 +361,128 @@ test04CartsIdObteinedAtCreationIdentifiesTheCartInTheStore
 	self assert: ((store getCartFromId: (cart id)) = cart)
 			! !
 
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:24:07'!
+test05CanAddValidProductToCart
+	| editorial store anUser cart product |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+	editorial  add: product. 
+
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	cart _ store usersCart: anUser.
+
+	self assert: ((cart products) size = 2).
+			! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:28:27'!
+test06CantAddInValidProductToCart
+	| editorial store anUser cart product |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+
+	cart _ store usersCart: anUser.
+	self
+		should: [store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cart invalidProductErrorDescription.
+			self assert: ((cart products) size = 0).
+				]
+	! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:39:46'!
+test07CanListProductToCart
+	| editorial store anUser cart product list1 list2 product2 |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+	product2 _ '456798'.
+	editorial  add: product.
+	editorial  add: product2.
+	cart _ store usersCart: anUser.
+	
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
+
+	list1 _ cart listItemsWithQuantities.
+	list2 _ store listProductsByCartId: (store usersCart: anUser) id .
+	
+	self assert: (list1 = list2).
+	
+	self deny: list1 isEmpty.
+	self assert:  [list1 includes: {product.2}].
+	self assert:  [list1 includes: {product2.6}].
+	! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:55:04'!
+test08StoreCanCheckOutWithCreditCard
+	| editorial store anUser product product2 |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+	product2 _ '456798'.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	
+	
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
+	self assert: (store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current) = 852.
+	
+	! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:12:38'!
+test09StoreCanListUsersPurchases
+	| editorial store anUser product product2 |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+	product2 _ '456798'.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	"Compra numero 0"
+	self
+		should: [store listPurchasesFromClientId: anUser pass: 'chau'.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Store purchasesListError.	].
+	
+	
+	"Compra numero 1"
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 5 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 1 .
+	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 1.
+	
+	"Compra numero 2"
+	store signIn: anUser password: 'chau'.
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
+	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.! !
+
 
 !classDefinition: #Cart category: #'TusLibros.com'!
 Object subclass: #Cart
@@ -702,25 +824,44 @@ creditCardOutOfFoundsErrorDescription
 
 !classDefinition: #Store category: #'TusLibros.com'!
 Object subclass: #Store
-	instanceVariableNames: 'editorial users usersCart idCarts catalog'
+	instanceVariableNames: 'editorial users usersCart idCarts catalog cashier historicPurchases'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:26:30'!
+addToCartId: aCartId product: aProduct quantity: aCopies 
+	| cart |
+	cart _ self getCartFromId: aCartId. 
+	cart add: aProduct copies:aCopies.! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:18:57'!
+checkout: aCartId withNumberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear 
+	| cart aCreditCard total userId |
+	cart _ self getCartFromId: aCartId.
+	aCreditCard _ CreditCard numberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear.
+	 
+	total _ cashier checkout:  cart using: aCreditCard.
+	userId _ self userOfCart: cart.
+	historicPurchases at: userId put: cart. 
+	
+	^total
+! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:27:17'!
 createUser: anUser pass: anPass 
 	users  at: anUser put: anPass .! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:25:10'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:11:17'!
+editorial
+^editorial 
+	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:50:49'!
 for: anEditorial 
 	editorial _ anEditorial .
-	catalog _ anEditorial  catalog. ! !
-
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:10:00'!
-getCartFor: anUser 
-	(usersCarts at: anUser).
-	
-	! !
+	catalog _ anEditorial  catalog. 
+	cashier _ Cashier from: editorial.! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:23:30'!
 getCartFromId: aId 
@@ -732,13 +873,28 @@ hasCartFrom: anUser
  	^usersCart includesKey: anUser 
 	! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:22:24'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:11:42'!
 initialize
 
 	users  _ Dictionary new.
 	usersCart _ Dictionary  new.
+	historicPurchases _ Dictionary new.
 	
 	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:39:16'!
+listProductsByCartId: aCartId 
+	| cart |
+	cart _ self getCartFromId: aCartId. 
+	^cart listItemsWithQuantities .! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:13:17'!
+listPurchasesFromClientId: aClientId pass: aPassword 
+
+
+	self signIn: aClientId password: aPassword .
+	(historicPurchases includesKey: aClientId )ifFalse: [^ self error: Store purchasesListError ].
+	^historicPurchases at: aClientId .! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:00:15'!
 signIn: anUser password: anPass 
@@ -746,6 +902,10 @@ signIn: anUser password: anPass
 			((users at: anUser)  = anPass) ifTrue: [usersCart  at: anUser  put: (StoreCart fromStore: self).] ifFalse: [^ self error: Store invalidPassErrorMessage]	
 			] ifFalse: [^self error: Store invalidUserErrorMessage].
 			! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:19:31'!
+userOfCart: aStoreCart 
+	"Recorrer para obtener id de la persona".! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:52:53'!
 usersCart: aUser 
@@ -772,21 +932,43 @@ invalidPassErrorMessage
 invalidUserErrorMessage
 	^'Usuario no registrado en el STORE'.! !
 
+!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:05:51'!
+purchasesListError
+	^'Error a Listar'! !
+
 
 !classDefinition: #StoreCart category: #'TusLibros.com'!
 Object subclass: #StoreCart
-	instanceVariableNames: 'store id'
+	instanceVariableNames: 'store id cart'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:14:22'!
+add: aProduct copies: aCopies 
+	"No salio el DoesNotUnderstood"
+	cart add: aProduct copies: aCopies .! !
 
 !StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:06:58'!
 id
 	^self hash. ! !
 
-!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:06:38'!
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:54:22'!
+isEmpty
+	^cart isEmpty .! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:38:19'!
+listItemsWithQuantities
+	^cart listItemsWithQuantities .! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:16:40'!
+products
+	^cart products.! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:10:50'!
 store: aStore 
 	store _ aStore.  
+	cart _ Cart fromEditorial: aStore editorial. 
 	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
