@@ -5,6 +5,9 @@ TestCase subclass: #TestTusLibrosCom
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:49:34'!
+setup! !
+
 !TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 17:52:27'!
 test01CanCreateACartFromAnEditorial
 	| cart |
@@ -113,17 +116,17 @@ test10EditorialCashiersCanCalculatePurchasePrice
 	
 	! !
 
-!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:20:39'!
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:37:21'!
 test11CashierOnlyAcceptsValidCreditCard
-	| editorial cashier creditCard cart product |
+	| editorial cashier creditCard cart product aMonthOfYear |
 	editorial := Editorial withName: 'Yenny'.	
 	cashier := Cashier from: editorial.
 	cart := Cart fromEditorial: editorial .
 	product := Object new.
 	editorial add: product .
 	cart add: product copies: 4.
-	
-	creditCard := CreditCard newExpired.
+	aMonthOfYear := GregorianMonthOfYear  current previous .
+	creditCard := CreditCard withExpiration: aMonthOfYear.
 	self 
 		should: [ cashier checkout: cart using: creditCard. ]
 		raise: Error  
@@ -171,7 +174,7 @@ test13ListItemsCart
 
 ! !
 
-!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:29:10'!
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:23:17'!
 test14CashierCalculatesTotal
 
 	| cart editorialCatalogue cashier editorial product product2 |
@@ -183,32 +186,180 @@ test14CashierCalculatesTotal
 	editorial add: product withPrice: 420 .
 	editorial add: product2 withPrice: 2 .
 	cashier := Cashier from: editorial.
-	cashier withPricesCatalogue: editorial catalog.
 	cart := Cart fromEditorial: editorial .
 	cart add: product copies: 3.
 	cart add: product2 copies: 3.
 	self assert: (cashier assess: cart) = 1266.
 	! !
 
-!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 21:47:16'!
-test15CheckOut
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:09:48'!
+test15CheckOutWithNonExpiredCreditCard
 
-	| cart  creditCard editorial cashier numberCard owner toMonth toYear product |
+	| cart  creditCard editorial cashier product product2 |
 	editorial := Editorial withName: 'Yenny'.
 	cart := Cart fromEditorial: editorial.
 	cashier := Cashier from: editorial.
-	owner := 'XXX'.
-	numberCard := '1122334455'.
-	toMonth :=  '11'.
-	toYear := '2020'.
-	creditCard := CreditCard numberCard: numberCard owner: owner withExpirationMonth:  toMonth year: toYear .
-	product := Object new.
-	editorial add: product .
-	cart add: product copies: 4.
-	"cashier checkout: cart using: creditCard. 
-	Quedo hardcore del anterior test hay que verlo manana :D"
+	creditCard := CreditCard numberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	product := 4356.
+	product2 := 1234.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	cashier := Cashier from: editorial.
+	cart := Cart fromEditorial: editorial .
+	cart add: product copies: 3.
+	cart add: product2 copies: 3.
+	self assert: (cashier checkout: cart using: creditCard) = 1266.! !
+
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:04:38'!
+test16DebitStringInterfaceToCorrect
+
+	| cart  creditCard editorial cashier product product2 total convertToString aDate stringDate |
+	editorial := Editorial withName: 'Yenny'.
+	cart := Cart fromEditorial: editorial.
+	cashier := Cashier from: editorial.
+	aDate := GregorianMonthOfYear  current.
+	creditCard := CreditCard numberCard: '1122334455' owner: 'XXX' withExpiration:  aDate.
+	stringDate := aDate monthNumber printString, aDate year number printString.
+	product := 4356.
+	product2 := 1234.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	cashier := Cashier from: editorial.
+	cart := Cart fromEditorial: editorial .
+	cart add: product copies: 3.
+	cart add: product2 copies: 3.
+	total := cashier checkout: cart using: creditCard.
+	convertToString := '?creditCardNumber=','1122334455','&','creditCardExpiration=',stringDate ,'&','creditCardOwner=XXX', '&','transactionAmount=',total printString.
 	
+	self assert: [(cashier generateTransactionMessage: total with: creditCard ) = convertToString ].! !
+
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:20:37'!
+test17CreditCardOutOfFoundsProducesError
+
+	| cart  creditCard editorial cashier product product2 total convertToString aDate stringDate mp |
+	editorial := Editorial withName: 'Yenny'.
+	cart := Cart fromEditorial: editorial.
+	cashier := Cashier from: editorial.
+	aDate := GregorianMonthOfYear  current.
+	creditCard := CreditCard numberCard: '1122334455' owner: 'XXX' withExpiration:  aDate.
+	stringDate := aDate monthNumber printString, aDate year number printString.
+	product := 4356.
+	product2 := 1234.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	cashier := Cashier from: editorial.
+	cart := Cart fromEditorial: editorial .
+	cart add: product copies: 3.
+	cart add: product2 copies: 3.
+	total := cashier checkout: cart using: creditCard.
+	convertToString := '?creditCardNumber=','1122334455','&','creditCardExpiration=',stringDate ,'&','creditCardOwner=XXX', '&','transactionAmount=',total printString.
+	
+	mp := MPProcesorSimulator new.
+	mp addAsCardOutOfFounds: creditCard .
+	
+	self 
+		should: [ mp debitOperation: total with: creditCard . ]
+		raise: Error  
+		withExceptionDo: [ :anError | 
+			self assert: anError  messageText = MPProcesorSimulator creditCardOutOfFoundsErrorDescription ].
 	! !
+
+!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 23:05:13'!
+test18CreditCardInvalidProducesError
+
+	| cart  creditCard editorial cashier product product2 total convertToString aDate stringDate mp |
+	editorial := Editorial withName: 'Yenny'.
+	cart := Cart fromEditorial: editorial.
+	cashier := Cashier from: editorial.
+	aDate := GregorianMonthOfYear  current.
+	creditCard := CreditCard numberCard: '1122334455' owner: 'XXX' withExpiration:  aDate.
+	stringDate := aDate monthNumber printString, aDate year number printString.
+	product := 4356.
+	product2 := 1234.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+	cashier := Cashier from: editorial.
+	cart := Cart fromEditorial: editorial .
+	cart add: product copies: 3.
+	cart add: product2 copies: 3.
+	total := cashier checkout: cart using: creditCard.
+	convertToString := 'creditCardNumber=','1122334455','&','creditCardExpiration=',stringDate ,'&','creditCardOwner=XXX', '&','transactionAmount=',total printString.
+	
+	mp := MPProcesorSimulator new.
+	mp addAs: creditCard .
+	self 
+		should: [ mp debitOperation: total with: creditCard .  ]
+		raise: Error  
+		withExceptionDo: [ :anError | 
+			self assert: anError  messageText = MPProcesorSimulator creditCardInvalidFoundsErrorDescription ].
+	! !
+
+
+!classDefinition: #TestXXX category: #'TusLibros.com'!
+TestCase subclass: #TestXXX
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:38:13'!
+test01CartCantBeCreatedByInvalidPass
+	| editorial store user |
+	editorial := Editorial withName: 'Yenny'.
+	
+	store:= Store from: editorial.
+	
+	user := 'hola'.
+	
+self 
+		should: [ store signIn: 'hola' password: 'pepito']
+		raise: Error  
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Store invalidUserErrorMessage. 
+			self deny: (store hasCartFrom: user)].
+		! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:37:53'!
+test02CartCantBeCreatedByUserWithInvalidPass
+	| editorial store user |
+	editorial := Editorial withName: 'Yenny'.
+	
+	store:= Store from: editorial.
+	
+	store createUser: 'hola' pass: 'chau'.
+	
+self 
+		should: [ store signIn: 'hola' password: 'pepito']
+		raise: Error  
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Store invalidPassErrorMessage. 
+			self deny: (store hasCartFrom: user)].
+		! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:37:40'!
+test03CartCantBeCreatedByStoreUser
+	| editorial store anUser |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	self assert: (store hasCartFrom: anUser) 
+			! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:50:14'!
+test04CartsIdObteinedAtCreationIdentifiesTheCartInTheStore
+	| editorial store anUser cart |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	store createUser: anUser pass: 'chau'.
+	store signIn: anUser password: 'chau'.
+	cart _ store usersCart: anUser .
+	self assert: ((store getCartFromId: (cart id)) = cart)
+			! !
 
 
 !classDefinition: #Cart category: #'TusLibros.com'!
@@ -218,36 +369,25 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:31:53'!
+!Cart methodsFor: 'adding' stamp: 'ELR 10/27/2017 18:31:53'!
 add: aProduct 
 	(editorial includes: aProduct) ifFalse: [^self error: Cart invalidProductErrorDescription ].
 	products add: aProduct.! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:36:28'!
+!Cart methodsFor: 'adding' stamp: 'ELR 10/27/2017 18:36:28'!
 add: aProduct copies: aCuantity 
 	aCuantity timesRepeat: [self add: aProduct] .! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 17:55:09'!
+
+!Cart methodsFor: 'accesing' stamp: 'ELR 10/27/2017 17:55:09'!
 editorial
 	^editorial.! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 17:54:07'!
-editorial: editorialName 
-	editorial _ editorialName.! !
-
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:19:41'!
+!Cart methodsFor: 'accesing' stamp: 'ELR 10/27/2017 18:19:41'!
 includes: aProduct 
 	^products  includes: aProduct .! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:19:07'!
-initialize
-	products := OrderedCollection new .! !
-
-!Cart methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:14:05'!
-isEmpty
-	^products size = 0.! !
-
-!Cart methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 21:50:55'!
+!Cart methodsFor: 'accesing' stamp: 'yn 10/29/2017 21:50:55'!
 listItemsWithQuantities
 	|listOfItems|
 	
@@ -259,13 +399,27 @@ listItemsWithQuantities
 	^listOfItems.
 ! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:23:59'!
+!Cart methodsFor: 'accesing' stamp: 'ELR 10/27/2017 19:23:59'!
 products
 	^products! !
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:38:39'!
+!Cart methodsFor: 'accesing' stamp: 'ELR 10/27/2017 18:38:39'!
 stockOf: aProduct 
 	^products occurrencesOf: aProduct ! !
+
+
+!Cart methodsFor: 'check' stamp: 'yn 10/29/2017 15:14:05'!
+isEmpty
+	^products size = 0.! !
+
+
+!Cart methodsFor: 'initialize' stamp: 'ELR 10/27/2017 17:54:07'!
+editorial: editorialName 
+	editorial _ editorialName.! !
+
+!Cart methodsFor: 'initialize' stamp: 'ELR 10/27/2017 18:19:07'!
+initialize
+	products := OrderedCollection new .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -287,7 +441,7 @@ invalidProductErrorDescription
 
 !classDefinition: #Cashier category: #'TusLibros.com'!
 Object subclass: #Cashier
-	instanceVariableNames: 'editorial catalog total'
+	instanceVariableNames: 'editorial catalog total stringToOperation'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -299,7 +453,7 @@ assess: aCart
 	aCart products do:[:each | bill:= bill + (editorial priceFor: each)].
 	^bill.! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:25:23'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:07:49'!
 checkout: aCart using: aCreditCard 
 	
 	| cart creditCard |
@@ -309,33 +463,33 @@ checkout: aCart using: aCreditCard
 	cart isEmpty 
 		ifTrue: [ ^self error: Cashier CashierEmptyCartErrorDescription  ].
 		
-	creditCard isExpired 
+	(creditCard isExpired: GregorianMonthOfYear  current)
 		ifTrue: [ ^self error: Cashier invalidCreditCardErrorDescription  ].
 		
-		total _ self assess: cart.! !
+		total _ self assess: cart.
+		
+		^total.! !
 
 !Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:15:31'!
 editorial: anEditorial 
 	editorial _ anEditorial .
 	catalog = Dictionary new.! !
 
+!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:04:17'!
+generateTransactionMessage: aTotal with: aCreditCard 
+	| expirationCreditCard numberCreditCard ownerCreditCard totalOperation convertToString |
+	totalOperation _ aTotal.
+	ownerCreditCard _ aCreditCard  owner.
+	numberCreditCard _ aCreditCard  numberCard.
+	expirationCreditCard _ aCreditCard expiration .
+	
+	convertToString := '?creditCardNumber=',numberCreditCard,'&','creditCardExpiration=',expirationCreditCard monthNumber printString, expirationCreditCard  year number printString ,'&','creditCardOwner=',ownerCreditCard ,'&','transactionAmount=',totalOperation printString .
+	stringToOperation _ convertToString .
+	^convertToString.! !
+
 !Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:25:53'!
 totalCart
 	^total.! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:44:26'!
-useCreditCard: card
-	| monthNow yearNow |
-	yearNow := GregorianYear new.
-	monthNow := GregorianMonth new.
-	
-	card year >= yearNow ifTrue: [ card year = yearNow ifTrue: [card month < monthNow ifTrue: [self error: Cashier invalidCreditCardErrorDescription ]] ] ifFalse: [self error: Cashier invalidCreditCardErrorDescription ] 
-	
-	! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:14:42'!
-withPricesCatalogue: aCatalog 
-	catalog _ aCatalog .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -366,36 +520,35 @@ Object subclass: #CreditCard
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:26:32'!
-initExpired
-	expiration := Date yesterday.! !
+!CreditCard methodsFor: 'dataInitialize' stamp: 'yn 10/30/2017 18:40:59'!
+expiration: aGregorianMonthOfYear 
+	expiration := aGregorianMonthOfYear! !
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:22:47'!
-isExpired
-	^expiration < Date today.! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:37:16'!
-month: aGregorianMonth year: aGregorianYear 
-	toMonth _ aGregorianMonth .
-	toYear _ aGregorianYear .
-	
-	! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:30:44'!
-numberCard
- ^numberCard.! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:29:23'!
+!CreditCard methodsFor: 'dataInitialize' stamp: 'yn 10/29/2017 15:29:23'!
 numberCard: aNumberCard 
 	numberCard _ aNumberCard .! !
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:30:29'!
-owner
-	^owner.! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:30:01'!
+!CreditCard methodsFor: 'dataInitialize' stamp: 'yn 10/29/2017 15:30:01'!
 owner: aOwner
 	owner _ aOwner .! !
+
+
+!CreditCard methodsFor: 'check' stamp: 'yn 10/30/2017 20:06:22'!
+isExpired: aGregorianDate
+	^expiration < aGregorianDate .! !
+
+
+!CreditCard methodsFor: 'accesing' stamp: 'yn 10/30/2017 20:08:40'!
+expiration
+	^expiration.! !
+
+!CreditCard methodsFor: 'accesing' stamp: 'yn 10/29/2017 15:30:44'!
+numberCard
+ ^numberCard.! !
+
+!CreditCard methodsFor: 'accesing' stamp: 'yn 10/29/2017 15:30:29'!
+owner
+	^owner.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -403,20 +556,24 @@ owner: aOwner
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:04:10'!
-newExpired
-	^ self new initExpired. ! !
-
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:28:26'!
-numberCard: aNumberCard owner: aOwner withExpirationMonth: aGregorianMonth year: aGregorianYear 
+!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:47:05'!
+numberCard: aNumberCard owner: aOwner withExpiration: aGregorianMonthOfYear
 	| card |
 	card _ self new.
-	card month: aGregorianMonth  year: aGregorianYear .
+	card expiration: aGregorianMonthOfYear.
 	card numberCard: aNumberCard .
 	card owner: aOwner .
 	^card.
 	
 	! !
+
+!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:40:39'!
+withExpiration: aGregorianMonthOfYear 
+	
+	| aCard |
+	aCard := self new.
+	aCard expiration: aGregorianMonthOfYear .
+	^aCard.! !
 
 !CreditCard class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:35:38'!
 withExpirationMonth: aGregorianMonth year: aGregorianYear 
@@ -435,48 +592,51 @@ Object subclass: #Editorial
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:13:36'!
+!Editorial methodsFor: 'adding' stamp: 'ELR 10/27/2017 18:13:36'!
 add: anProduct
 	products add: anProduct.
 	! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:15:22'!
+!Editorial methodsFor: 'adding' stamp: 'ELR 10/27/2017 19:15:22'!
 add: aProduct withPrice: aPrice 
 	self add: aProduct .
 	catalog at: aProduct put: aPrice.! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 22:13:31'!
+
+!Editorial methodsFor: 'initialize' stamp: 'yn 10/29/2017 22:13:31'!
 catalog
 	^catalog.! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:06:48'!
+!Editorial methodsFor: 'initialize' stamp: 'ELR 10/27/2017 19:06:48'!
 employ: aCashier 
 	cashier _ aCashier.! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:06:27'!
+!Editorial methodsFor: 'initialize' stamp: 'ELR 10/27/2017 19:06:27'!
 employs: aCashier 
 	^cashier = aCashier .! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:15:48'!
-includes: aProduct 
-	^products includes: aProduct .! !
-
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:05:33'!
+!Editorial methodsFor: 'initialize' stamp: 'ELR 10/27/2017 19:05:33'!
 initialize
 	products := OrderedCollection new.
 	catalog := Dictionary new.
 
 	! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:10:54'!
-name
-	^name.! !
-
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:10:17'!
+!Editorial methodsFor: 'initialize' stamp: 'ELR 10/27/2017 18:10:17'!
 name: aName
 	name _ aName .! !
 
-!Editorial methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:54:45'!
+
+!Editorial methodsFor: 'accesing' stamp: 'ELR 10/27/2017 18:10:54'!
+name
+	^name.! !
+
+
+!Editorial methodsFor: 'check' stamp: 'ELR 10/27/2017 18:15:48'!
+includes: aProduct 
+	^products includes: aProduct .! !
+
+!Editorial methodsFor: 'check' stamp: 'ELR 10/27/2017 18:54:45'!
 priceFor: aProduct
 	^catalog at: aProduct .! !
 
@@ -492,3 +652,153 @@ withName: aName
 	editorial _ self new.
 	editorial name: aName .
 	^editorial.! !
+
+
+!classDefinition: #MPProcesorSimulator category: #'TusLibros.com'!
+Object subclass: #MPProcesorSimulator
+	instanceVariableNames: 'outOfFoundsList invalidList'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!MPProcesorSimulator methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:19:01'!
+addAs: aInvalidCard
+	
+	invalidList add: aInvalidCard .! !
+
+!MPProcesorSimulator methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:20:01'!
+addAsCardOutOfFounds: aCreditCardOutOfFounds
+	
+	outOfFoundsList add: aCreditCardOutOfFounds .! !
+
+!MPProcesorSimulator methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:27:20'!
+debitOperation: aTotalOperation with: aCreditCard
+	
+	(outOfFoundsList includes: aCreditCard ) ifTrue: [^self error: MPProcesorSimulator creditCardOutOfFoundsErrorDescription].
+	
+	(invalidList includes: aCreditCard ) ifTrue: [^self error: MPProcesorSimulator creditCardInvalidFoundsErrorDescription].
+	! !
+
+!MPProcesorSimulator methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:17:25'!
+initialize
+	
+	outOfFoundsList := OrderedCollection new.	
+	invalidList := OrderedCollection  new.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MPProcesorSimulator class' category: #'TusLibros.com'!
+MPProcesorSimulator class
+	instanceVariableNames: ''!
+
+!MPProcesorSimulator class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:14:49'!
+creditCardInvalidFoundsErrorDescription
+	^'Tarjeta Robada'.! !
+
+!MPProcesorSimulator class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:54:06'!
+creditCardOutOfFoundsErrorDescription
+	^'Fondos Insuficientes'.! !
+
+
+!classDefinition: #Store category: #'TusLibros.com'!
+Object subclass: #Store
+	instanceVariableNames: 'editorial users usersCart idCarts catalog'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:27:17'!
+createUser: anUser pass: anPass 
+	users  at: anUser put: anPass .! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:25:10'!
+for: anEditorial 
+	editorial _ anEditorial .
+	catalog _ anEditorial  catalog. ! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:10:00'!
+getCartFor: anUser 
+	(usersCarts at: anUser).
+	
+	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:23:30'!
+getCartFromId: aId 
+	usersCart  do: [:each|   each id = aId ifTrue: [ ^each]].
+	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:18:58'!
+hasCartFrom: anUser
+ 	^usersCart includesKey: anUser 
+	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:22:24'!
+initialize
+
+	users  _ Dictionary new.
+	usersCart _ Dictionary  new.
+	
+	! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:00:15'!
+signIn: anUser password: anPass 
+	(users includesKey: anUser) ifTrue:[
+			((users at: anUser)  = anPass) ifTrue: [usersCart  at: anUser  put: (StoreCart fromStore: self).] ifFalse: [^ self error: Store invalidPassErrorMessage]	
+			] ifFalse: [^self error: Store invalidUserErrorMessage].
+			! !
+
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:52:53'!
+usersCart: aUser 
+	^usersCart at: aUser.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Store class' category: #'TusLibros.com'!
+Store class
+	instanceVariableNames: ''!
+
+!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 19:54:40'!
+from: anEditorial 
+	| aStore |
+	aStore _ self new.
+	aStore for: anEditorial .
+	^aStore.! !
+
+!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:27:55'!
+invalidPassErrorMessage
+	^'Password incorrecta'.! !
+
+!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:07:27'!
+invalidUserErrorMessage
+	^'Usuario no registrado en el STORE'.! !
+
+
+!classDefinition: #StoreCart category: #'TusLibros.com'!
+Object subclass: #StoreCart
+	instanceVariableNames: 'store id'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:06:58'!
+id
+	^self hash. ! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:06:38'!
+store: aStore 
+	store _ aStore.  
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StoreCart class' category: #'TusLibros.com'!
+StoreCart class
+	instanceVariableNames: ''!
+
+!StoreCart class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:01:57'!
+fromStore: aStore 
+	| aStoreCart |
+	aStoreCart _ self new.
+	aStoreCart store: aStore.
+	^aStoreCart.
+	! !
