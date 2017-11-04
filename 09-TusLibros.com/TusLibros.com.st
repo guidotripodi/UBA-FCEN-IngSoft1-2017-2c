@@ -5,9 +5,6 @@ TestCase subclass: #TestTusLibrosCom
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:49:34'!
-setup! !
-
 !TestTusLibrosCom methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 17:52:27'!
 test01CanCreateACartFromAnEditorial
 	| cart |
@@ -297,17 +294,44 @@ test18CreditCardInvalidProducesError
 
 !classDefinition: #TestXXX category: #'TusLibros.com'!
 TestCase subclass: #TestXXX
-	instanceVariableNames: ''
+	instanceVariableNames: 'editorial'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:38:13'!
-test01CartCantBeCreatedByInvalidPass
-	| editorial store user |
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:35:16'!
+SigninUserStore: anStore clientId: anUser pass: aPass
+	
+	
+	anStore createUser: anUser pass: aPass.
+	anStore signIn: anUser password: aPass.
+	^anUser 
+	! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:19:03'!
+StoreAndEditorial
+	|  store |
 	editorial := Editorial withName: 'Yenny'.
 	
 	store:= Store from: editorial.
+	^store
+! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:21:18'!
+productExistsFromEditorial: aISBNProduct 
+	editorial add: aISBNProduct .
+	^aISBNProduct .! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:31:25'!
+productExistsFromEditorial: aISBNProduc withPrice: aPrice 
+	editorial add: aISBNProduc withPrice: aPrice .
+	^aISBNProduc .
+	! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:08:33'!
+test01CartCantBeCreatedByInvalidPass
+	| store user |
+	store _ self StoreAndEditorial.
 	
 	user := 'hola'.
 	
@@ -319,12 +343,10 @@ self
 			self deny: (store hasCartFrom: user)].
 		! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:37:53'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:08:53'!
 test02CartCantBeCreatedByUserWithInvalidPass
-	| editorial store user |
-	editorial := Editorial withName: 'Yenny'.
-	
-	store:= Store from: editorial.
+	| store user |
+	store _ self StoreAndEditorial.
 	
 	store createUser: 'hola' pass: 'chau'.
 	
@@ -336,58 +358,42 @@ self
 			self deny: (store hasCartFrom: user)].
 		! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:37:40'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:36:13'!
 test03CartCantBeCreatedByStoreUser
-	| editorial store anUser |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
+	| store anUser |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' . 
 	self assert: (store hasCartFrom: anUser) 
 			! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:50:14'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:36:23'!
 test04CartsIdObteinedAtCreationIdentifiesTheCartInTheStore
-	| editorial store anUser cart |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
+	| store anUser cart |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
 	cart _ store usersCart: anUser .
 	self assert: ((store getCartFromId: (cart id)) = cart)
 			! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:24:07'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:36:36'!
 test05CanAddValidProductToCart
-	| editorial store anUser cart product |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
+	| store anUser cart product |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
 	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
-	product _ '123456'.
-	editorial  add: product. 
-
+	product _ self productExistsFromEditorial: '123456'.
+	
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
 	cart _ store usersCart: anUser.
 
 	self assert: ((cart products) size = 2).
 			! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:28:27'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:36:56'!
 test06CantAddInValidProductToCart
-	| editorial store anUser cart product |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
+	| store anUser cart product |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
 	product _ '123456'.
 
 	cart _ store usersCart: anUser.
@@ -400,24 +406,20 @@ test06CantAddInValidProductToCart
 				]
 	! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:39:46'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:44:29'!
 test07CanListProductToCart
-	| editorial store anUser cart product list1 list2 product2 |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
+	| store anUser cart product list1 list2 product2 |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
 	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
-	product _ '123456'.
-	product2 _ '456798'.
-	editorial  add: product.
-	editorial  add: product2.
+	product _ self productExistsFromEditorial: '123456'.
+	product2 _ self productExistsFromEditorial: '456798'.
 	cart _ store usersCart: anUser.
-	
-	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
-	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 
+store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
+	
+	
 	list1 _ cart listItemsWithQuantities.
 	list2 _ store listProductsByCartId: (store usersCart: anUser) id .
 	
@@ -428,40 +430,26 @@ test07CanListProductToCart
 	self assert:  [list1 includes: {product2.6}].
 	! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:32:04'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:37:08'!
 test08StoreCanCheckOutWithCreditCard
-	| editorial store anUser product product2 |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
-	product _ '123456'.
-	product2 _ '456798'.
-	editorial add: product withPrice: 420 .
-	editorial add: product2 withPrice: 2 .
-	
-	
+	| store anUser product product2 |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
+	product _ self productExistsFromEditorial: '123456' withPrice: 420.
+	product2 _ self productExistsFromEditorial: '456798' withPrice: 2. 
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 	self assert: (store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current) = 852.
 	
 	! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:03:57'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:37:15'!
 test09StoreCanListUsersPurchases
-	| editorial store anUser product product2 |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	store createUser: anUser pass: 'chau'.
-	store signIn: anUser password: 'chau'.
-	product _ '123456'.
-	product2 _ '456798'.
-	editorial add: product withPrice: 420 .
-	editorial add: product2 withPrice: 2 .
+	| store anUser product product2 |
+	store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
+	product _ self productExistsFromEditorial: '123456' withPrice: 420.
+	product2 _ self productExistsFromEditorial: '456798' withPrice: 2. 
 	"Compra numero 0"
 	self
 		should: [store listPurchasesFromClientId: anUser pass: 'chau'.]
@@ -483,21 +471,15 @@ test09StoreCanListUsersPurchases
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:45:51'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 20:39:24'!
 test10StoreCanListSeveralUsersPurchases
-	| editorial store anUser product product2 anUser2 |
-	editorial := Editorial withName: 'Yenny'.
-	store:= Store from: editorial.
-	
-	anUser _ 'pepe'.
-	anUser2 _ 'hola'.
-	store createUser: anUser pass: 'chau'.
-	store createUser: anUser2 pass: 'hola'.
-	store signIn: anUser password: 'chau'.
-	product _ '123456'.
-	product2 _ '456798'.
-	editorial add: product withPrice: 420 .
-	editorial add: product2 withPrice: 2 .
+	| store anUser product product2 anUser2 |
+		store _ self StoreAndEditorial.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
+	product _ self productExistsFromEditorial: '123456' withPrice: 420.
+	product2 _ self productExistsFromEditorial: '456798' withPrice: 2. 
+
+
 		
 	"Compra numero 1 user pepe"
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 5 .
@@ -506,7 +488,8 @@ test10StoreCanListSeveralUsersPurchases
 	self assert: ((store listPurchasesFromClientId: anUser pass: 'chau') size) = 1.
 	
 	"Compra numero 1 user hola"
-	store signIn: anUser2 password: 'hola'.
+	
+	anUser2 _ self SigninUserStore: store clientId: 'hola' pass: 'hola' .
 	store addToCartId: (store usersCart: anUser2) id product: product quantity: 5 .
 	store addToCartId: (store usersCart: anUser2) id product: product2 quantity: 1 .
 	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
@@ -514,7 +497,7 @@ test10StoreCanListSeveralUsersPurchases
 	
 	
 	"Compra numero 2 user pepe"
-	store signIn: anUser password: 'chau'.
+	anUser _ self SigninUserStore: store clientId: 'pepe' pass: 'chau' .
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
@@ -522,7 +505,7 @@ test10StoreCanListSeveralUsersPurchases
 	
 	
 	"Compra numero 2 user hola"
-	store signIn: anUser2 password: 'hola'.
+	anUser2 _ self SigninUserStore: store clientId: 'hola' pass: 'hola' .
 	store addToCartId: (store usersCart: anUser2) id product: product quantity: 8 .
 	store addToCartId: (store usersCart: anUser2) id product: product2 quantity: 5 .
 	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
