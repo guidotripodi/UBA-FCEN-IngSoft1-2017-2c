@@ -428,7 +428,7 @@ test07CanListProductToCart
 	self assert:  [list1 includes: {product2.6}].
 	! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 19:55:04'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:32:04'!
 test08StoreCanCheckOutWithCreditCard
 	| editorial store anUser product product2 |
 	editorial := Editorial withName: 'Yenny'.
@@ -449,7 +449,7 @@ test08StoreCanCheckOutWithCreditCard
 	
 	! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:12:38'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:03:57'!
 test09StoreCanListUsersPurchases
 	| editorial store anUser product product2 |
 	editorial := Editorial withName: 'Yenny'.
@@ -474,7 +474,7 @@ test09StoreCanListUsersPurchases
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 5 .
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 1 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
-	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 1.
+	self assert: ((store listPurchasesFromClientId: anUser pass: 'chau') size) = 1.
 	
 	"Compra numero 2"
 	store signIn: anUser password: 'chau'.
@@ -482,6 +482,51 @@ test09StoreCanListUsersPurchases
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.! !
+
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:45:51'!
+test10StoreCanListSeveralUsersPurchases
+	| editorial store anUser product product2 anUser2 |
+	editorial := Editorial withName: 'Yenny'.
+	store:= Store from: editorial.
+	
+	anUser _ 'pepe'.
+	anUser2 _ 'hola'.
+	store createUser: anUser pass: 'chau'.
+	store createUser: anUser2 pass: 'hola'.
+	store signIn: anUser password: 'chau'.
+	product _ '123456'.
+	product2 _ '456798'.
+	editorial add: product withPrice: 420 .
+	editorial add: product2 withPrice: 2 .
+		
+	"Compra numero 1 user pepe"
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 5 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 1 .
+	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: ((store listPurchasesFromClientId: anUser pass: 'chau') size) = 1.
+	
+	"Compra numero 1 user hola"
+	store signIn: anUser2 password: 'hola'.
+	store addToCartId: (store usersCart: anUser2) id product: product quantity: 5 .
+	store addToCartId: (store usersCart: anUser2) id product: product2 quantity: 1 .
+	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 1.
+	
+	
+	"Compra numero 2 user pepe"
+	store signIn: anUser password: 'chau'.
+	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
+	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
+	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.
+	
+	
+	"Compra numero 2 user hola"
+	store signIn: anUser2 password: 'hola'.
+	store addToCartId: (store usersCart: anUser2) id product: product quantity: 8 .
+	store addToCartId: (store usersCart: anUser2) id product: product2 quantity: 5 .
+	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
+	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 2.! !
 
 
 !classDefinition: #Cart category: #'TusLibros.com'!
@@ -835,16 +880,18 @@ addToCartId: aCartId product: aProduct quantity: aCopies
 	cart _ self getCartFromId: aCartId. 
 	cart add: aProduct copies:aCopies.! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:18:57'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:34:29'!
 checkout: aCartId withNumberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear 
-	| cart aCreditCard total userId |
+	| cart aCreditCard total userId carts |
 	cart _ self getCartFromId: aCartId.
 	aCreditCard _ CreditCard numberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear.
 	 
 	total _ cashier checkout:  cart using: aCreditCard.
 	userId _ self userOfCart: cart.
-	historicPurchases at: userId put: cart. 
-	
+	carts _ OrderedCollection new.
+	carts add: cart.
+	"historicPurchases at: userId put: carts. "
+	(historicPurchases includesKey: userId )ifFalse: [historicPurchases at: userId put: carts] ifTrue: [historicPurchases keysAndValuesDo: [:aKey :aValue |   aKey  = userId ifTrue: [aValue add: cart]]].
 	^total
 ! !
 
@@ -888,24 +935,28 @@ listProductsByCartId: aCartId
 	cart _ self getCartFromId: aCartId. 
 	^cart listItemsWithQuantities .! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:13:17'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:24:01'!
 listPurchasesFromClientId: aClientId pass: aPassword 
 
 
+	| listClientPurchases |
 	self signIn: aClientId password: aPassword .
 	(historicPurchases includesKey: aClientId )ifFalse: [^ self error: Store purchasesListError ].
-	^historicPurchases at: aClientId .! !
+	listClientPurchases := OrderedCollection new.
+	historicPurchases keysAndValuesDo: [:aKey :aValue |   aKey  = aClientId ifTrue: [ listClientPurchases  _ aValue]].
+	
+	^listClientPurchases .! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:00:15'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 18:45:23'!
 signIn: anUser password: anPass 
 	(users includesKey: anUser) ifTrue:[
 			((users at: anUser)  = anPass) ifTrue: [usersCart  at: anUser  put: (StoreCart fromStore: self).] ifFalse: [^ self error: Store invalidPassErrorMessage]	
 			] ifFalse: [^self error: Store invalidUserErrorMessage].
 			! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:19:31'!
+!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:02:07'!
 userOfCart: aStoreCart 
-	"Recorrer para obtener id de la persona".! !
+	usersCart  keysAndValuesDo: [:aKey :aValue |   aValue  = aStoreCart ifTrue: [ ^(aKey)]].! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:52:53'!
 usersCart: aUser 
