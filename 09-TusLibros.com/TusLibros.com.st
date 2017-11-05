@@ -511,7 +511,7 @@ test10StoreCanListSeveralUsersPurchases
 	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 2.! !
 
-!TestXXX methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 12:08:28'!
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 14:10:17'!
 test11StoreCarts30MinutesOlderBecomeInvalidForTheStore
 	| store anUser product clock cart |
 	editorial _ Editorial withName: 'Yenny'.
@@ -528,6 +528,7 @@ test11StoreCarts30MinutesOlderBecomeInvalidForTheStore
 		productExistsFromEditorial: '123456'
 		withPrice: 420.
 	cart _ store usersCart: anUser.
+	
 	self
 		should: [
 			store
@@ -839,15 +840,15 @@ Object subclass: #FakeCalendar
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:29:05'!
+!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 14:07:34'!
 goForwardMinutes: numberOfMinutes
 	
-	nowTime _ self now + numberOfMinutes .
+	nowTime _ self now + numberOfMinutes minutes .
 	! !
 
-!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:33:11'!
+!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 14:07:24'!
 initialize
-	 nowTime _ 1.! !
+	 nowTime _ 1 minutes.! !
 
 !FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:29:14'!
 now
@@ -943,11 +944,12 @@ for: anEditorial
 	catalog _ anEditorial  catalog. 
 	cashier _ Cashier from: editorial.! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 13:07:41'!
+!Store methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 14:10:03'!
 getCartFromId: aId 
-	| aCart |
+	| aCart comparison |
 	usersCart  do: [:each|   each id = aId ifTrue: [ aCart _ each]].
-	(((aCart createdAt) distanceTo: timeProvider now) > (30 minutes )) ifTrue: [^self error: Store invalidCartErrorMessage ].
+	comparison _ ((timeProvider now - (aCart createdAt)) > 30 minutes).
+	comparison ifTrue: [^self error: Store invalidCartErrorMessage ].
 	^aCart .
 	
 	! !
@@ -1013,12 +1015,12 @@ withTimeFrom: aCalendar
 Store class
 	instanceVariableNames: ''!
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 12:11:20'!
+!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 13:57:36'!
 from: anEditorial 
 	| aStore |
 	aStore _ self new.
 	aStore for: anEditorial .
-	aStore withTimeFrom: GregorianDateTime .
+	aStore withTimeFrom: DateAndTime .
 	^aStore.! !
 
 !Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:16:08'!
