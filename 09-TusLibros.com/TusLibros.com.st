@@ -511,6 +511,34 @@ test10StoreCanListSeveralUsersPurchases
 	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 2.! !
 
+!TestXXX methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 12:08:28'!
+test11StoreCarts30MinutesOlderBecomeInvalidForTheStore
+	| store anUser product clock cart |
+	editorial _ Editorial withName: 'Yenny'.
+	clock _ FakeCalendar new.
+	store _ Store
+		from: editorial
+		withTimeFrom: clock.
+	anUser _ self
+		SigninUserStore: store
+		clientId: 'pepe'
+		pass: 'chau'.
+	clock goForwardMinutes: 31.
+	product _ self
+		productExistsFromEditorial: '123456'
+		withPrice: 420.
+	cart _ store usersCart: anUser.
+	self
+		should: [
+			store
+				addToCartId: (store usersCart: anUser) id
+				product: product
+				quantity: 5 ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Store invalidCartErrorMessage ].
+	self assert: cart products size = 0.! !
+
 
 !classDefinition: #Cart category: #'TusLibros.com'!
 Object subclass: #Cart
@@ -804,6 +832,28 @@ withName: aName
 	^editorial.! !
 
 
+!classDefinition: #FakeCalendar category: #'TusLibros.com'!
+Object subclass: #FakeCalendar
+	instanceVariableNames: 'nowTime'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:29:05'!
+goForwardMinutes: numberOfMinutes
+	
+	nowTime _ self now + numberOfMinutes .
+	! !
+
+!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:33:11'!
+initialize
+	 nowTime _ 1.! !
+
+!FakeCalendar methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:29:14'!
+now
+	 ^nowTime .! !
+
+
 !classDefinition: #MPProcesorSimulator category: #'TusLibros.com'!
 Object subclass: #MPProcesorSimulator
 	instanceVariableNames: 'outOfFoundsList invalidList'
@@ -852,7 +902,7 @@ creditCardOutOfFoundsErrorDescription
 
 !classDefinition: #Store category: #'TusLibros.com'!
 Object subclass: #Store
-	instanceVariableNames: 'editorial users usersCart idCarts catalog cashier historicPurchases'
+	instanceVariableNames: 'editorial users usersCart catalog cashier historicPurchases timeProvider'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -893,9 +943,13 @@ for: anEditorial
 	catalog _ anEditorial  catalog. 
 	cashier _ Cashier from: editorial.! !
 
-!Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:23:30'!
+!Store methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 13:07:41'!
 getCartFromId: aId 
-	usersCart  do: [:each|   each id = aId ifTrue: [ ^each]].
+	| aCart |
+	usersCart  do: [:each|   each id = aId ifTrue: [ aCart _ each]].
+	(((aCart createdAt) distanceTo: timeProvider now) > (30 minutes )) ifTrue: [^self error: Store invalidCartErrorMessage ].
+	^aCart .
+	
 	! !
 
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:18:58'!
@@ -937,6 +991,10 @@ signIn: anUser password: anPass
 			] ifFalse: [^self error: Store invalidUserErrorMessage].
 			! !
 
+!Store methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:23:13'!
+time
+	^timeProvider now.! !
+
 !Store methodsFor: 'as yet unclassified' stamp: 'yn 11/4/2017 19:02:07'!
 userOfCart: aStoreCart 
 	usersCart  keysAndValuesDo: [:aKey :aValue |   aValue  = aStoreCart ifTrue: [ ^(aKey)]].! !
@@ -945,18 +1003,34 @@ userOfCart: aStoreCart
 usersCart: aUser 
 	^usersCart at: aUser.! !
 
+!Store methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:13:27'!
+withTimeFrom: aCalendar 
+	timeProvider _ aCalendar.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Store class' category: #'TusLibros.com'!
 Store class
 	instanceVariableNames: ''!
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 19:54:40'!
+!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 12:11:20'!
 from: anEditorial 
 	| aStore |
 	aStore _ self new.
 	aStore for: anEditorial .
+	aStore withTimeFrom: GregorianDateTime .
 	^aStore.! !
+
+!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:16:08'!
+from: anEditorial withTimeFrom: aCalendarClass
+	| aStore |
+	aStore _ self from: anEditorial.
+	aStore withTimeFrom: aCalendarClass.
+	^aStore.! !
+
+!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:47:20'!
+invalidCartErrorMessage
+	^'Carrito invalido'.! !
 
 !Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:27:55'!
 invalidPassErrorMessage
@@ -973,7 +1047,7 @@ purchasesListError
 
 !classDefinition: #StoreCart category: #'TusLibros.com'!
 Object subclass: #StoreCart
-	instanceVariableNames: 'store id cart'
+	instanceVariableNames: 'store id cart createdTime'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -982,6 +1056,14 @@ Object subclass: #StoreCart
 add: aProduct copies: aCopies 
 	"No salio el DoesNotUnderstood"
 	cart add: aProduct copies: aCopies .! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 11:56:39'!
+createdAt
+	^createdTime! !
+
+!StoreCart methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:24:43'!
+createdAt: aTimeReification 
+	createdTime _ aTimeReification .! !
 
 !StoreCart methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:06:58'!
 id
@@ -1011,10 +1093,11 @@ store: aStore
 StoreCart class
 	instanceVariableNames: ''!
 
-!StoreCart class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 21:01:57'!
+!StoreCart class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:19:53'!
 fromStore: aStore 
 	| aStoreCart |
 	aStoreCart _ self new.
 	aStoreCart store: aStore.
+	aStoreCart createdAt: aStore time.
 	^aStoreCart.
 	! !
