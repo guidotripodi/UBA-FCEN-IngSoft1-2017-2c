@@ -442,7 +442,7 @@ test08StoreCanCheckOutWithCreditCard
 	
 	! !
 
-!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/4/2017 20:37:15'!
+!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/6/2017 14:59:46'!
 test09StoreCanListUsersPurchases
 	| store anUser product product2 |
 	store _ self StoreAndEditorial.
@@ -462,15 +462,19 @@ test09StoreCanListUsersPurchases
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 1 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: ((store listPurchasesFromClientId: anUser pass: 'chau') size) = 1.
+	self assert: ((store listPurchasesTotalFromClientId: anUser pass: 'chau') ) = 2102.0.
+	
 	
 	"Compra numero 2"
 	store signIn: anUser password: 'chau'.
 	store addToCartId: (store usersCart: anUser) id product: product quantity: 2 .
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
-	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.! !
+	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.
+	self assert: ((store listPurchasesTotalFromClientId: anUser pass: 'chau') ) = 2954.0.
+	! !
 
-!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/4/2017 20:39:24'!
+!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/6/2017 15:39:35'!
 test10StoreCanListSeveralUsersPurchases
 	| store anUser product product2 anUser2 |
 		store _ self StoreAndEditorial.
@@ -508,7 +512,8 @@ test10StoreCanListSeveralUsersPurchases
 	store addToCartId: (store usersCart: anUser2) id product: product quantity: 8 .
 	store addToCartId: (store usersCart: anUser2) id product: product2 quantity: 5 .
 	store checkout:(store usersCart: anUser2) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
-	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 2.! !
+	self assert: ((store listPurchasesFromClientId: anUser2 pass: 'hola') size) = 2.
+	self assert: ((store listPurchasesTotalFromClientId: anUser2 pass: 'hola') ) = 5472.0.! !
 
 !TestXXX methodsFor: 'TestStore' stamp: 'ELR 11/5/2017 14:10:17'!
 test11StoreCarts30MinutesOlderBecomeInvalidForTheStore
@@ -859,6 +864,50 @@ goForwardMinutes: numberOfMinutes
 	! !
 
 
+!classDefinition: #HistoricClient category: #'TusLibros.com'!
+Object subclass: #HistoricClient
+	instanceVariableNames: 'aStoreCarts totalHistoric'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros.com'!
+
+!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:22:20'!
+initialize
+	aStoreCarts _ OrderedCollection new.
+	totalHistoric _ 0! !
+
+!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:27:00'!
+storeCart
+	^aStoreCarts .! !
+
+!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:21:41'!
+storeCart: aStoreCart 
+	aStoreCarts add: aStoreCart .! !
+
+!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:24:52'!
+total
+	^totalHistoric .! !
+
+!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:23:28'!
+total: aTotal 
+	| subtotal |
+	subtotal _ totalHistoric  + aTotal .
+	totalHistoric _ subtotal.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'HistoricClient class' category: #'TusLibros.com'!
+HistoricClient class
+	instanceVariableNames: ''!
+
+!HistoricClient class methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:21:15'!
+from: aStoreCart 
+	| aHistoricClient |
+	aHistoricClient _ self new.
+	aHistoricClient storeCart: aStoreCart.
+	^aHistoricClient.! !
+
+
 !classDefinition: #MPProcesorSimulator category: #'TusLibros.com'!
 Object subclass: #MPProcesorSimulator
 	instanceVariableNames: 'outOfFoundsList invalidList'
@@ -909,7 +958,7 @@ creditCardOutOfFoundsErrorDescription
 
 !classDefinition: #Store category: #'TusLibros.com'!
 Object subclass: #Store
-	instanceVariableNames: 'editorial users usersCart catalog cashier historicPurchases timeProvider idCarts'
+	instanceVariableNames: 'editorial users usersCart catalog cashier historicPurchases timeProvider idCarts historicPurchasesTotal'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -920,7 +969,7 @@ listProductsByCartId: aCartId
 	cart _ self getCartFromId: aCartId. 
 	^cart listItemsWithQuantities .! !
 
-!Store methodsFor: 'lists' stamp: 'yn 11/4/2017 19:24:01'!
+!Store methodsFor: 'lists' stamp: 'yn 11/6/2017 15:34:12'!
 listPurchasesFromClientId: aClientId pass: aPassword 
 
 
@@ -928,9 +977,22 @@ listPurchasesFromClientId: aClientId pass: aPassword
 	self signIn: aClientId password: aPassword .
 	(historicPurchases includesKey: aClientId )ifFalse: [^ self error: Store purchasesListError ].
 	listClientPurchases := OrderedCollection new.
-	historicPurchases keysAndValuesDo: [:aKey :aValue |   aKey  = aClientId ifTrue: [ listClientPurchases  _ aValue]].
 	
-	^listClientPurchases .! !
+	historicPurchases keysAndValuesDo: [:aKey :aValue |   aKey  = aClientId ifTrue: [ listClientPurchases _ aValue ]].
+	
+	^listClientPurchases.! !
+
+!Store methodsFor: 'lists' stamp: 'yn 11/6/2017 15:24:34'!
+listPurchasesTotalFromClientId: aClientId pass: aPassword 
+
+
+	| totalPurchases |
+	self signIn: aClientId password: aPassword .
+	(historicPurchasesTotal includesKey: aClientId )ifFalse: [^ self error: Store purchasesListError ].
+	totalPurchases _ 0.
+	historicPurchasesTotal keysAndValuesDo: [:aKey :aValue |   aKey  = aClientId ifTrue: [ totalPurchases _ aValue total]].
+	
+	^totalPurchases.! !
 
 
 !Store methodsFor: 'testing' stamp: 'yn 11/3/2017 19:11:17'!
@@ -953,12 +1015,13 @@ for: anEditorial
 idCarts: aIdCart 
 	idCarts _ aIdCart .! !
 
-!Store methodsFor: 'initialization' stamp: 'yn 11/3/2017 20:11:42'!
+!Store methodsFor: 'initialization' stamp: 'yn 11/6/2017 14:36:15'!
 initialize
 
 	users  _ Dictionary new.
 	usersCart _ Dictionary  new.
 	historicPurchases _ Dictionary new.
+	historicPurchasesTotal _ Dictionary new.
 	
 	! !
 
@@ -1004,9 +1067,9 @@ usersCart: aUser
 	^usersCart at: aUser.! !
 
 
-!Store methodsFor: 'cart' stamp: 'yn 11/4/2017 19:34:29'!
+!Store methodsFor: 'cart' stamp: 'yn 11/6/2017 15:30:48'!
 checkout: aCartId withNumberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear 
-	| cart aCreditCard total userId carts |
+	| cart aCreditCard total userId carts totals historicClient |
 	cart _ self getCartFromId: aCartId.
 	aCreditCard _ CreditCard numberCard: aCreditCardNumber owner: aName withExpiration: aGregorianMonthOfYear.
 	 
@@ -1014,8 +1077,13 @@ checkout: aCartId withNumberCard: aCreditCardNumber owner: aName withExpiration:
 	userId _ self userOfCart: cart.
 	carts _ OrderedCollection new.
 	carts add: cart.
-	"historicPurchases at: userId put: carts. "
+	totals _ OrderedCollection new.
+	totals add: total.
+	historicClient _ HistoricClient from: cart.
+	historicClient total: total.
 	(historicPurchases includesKey: userId )ifFalse: [historicPurchases at: userId put: carts] ifTrue: [historicPurchases keysAndValuesDo: [:aKey :aValue |   aKey  = userId ifTrue: [aValue add: cart]]].
+	(historicPurchasesTotal includesKey: userId )ifFalse: [historicPurchasesTotal at: userId put: historicClient] ifTrue: [historicPurchasesTotal keysAndValuesDo: [:aKey :aValue |   aKey  = userId ifTrue: [ aValue total: total].
+			aValue storeCart: cart.]].
 	^total
 ! !
 
