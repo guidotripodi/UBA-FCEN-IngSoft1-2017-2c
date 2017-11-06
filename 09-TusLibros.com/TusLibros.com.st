@@ -474,7 +474,7 @@ test09StoreCanListUsersPurchases
 	self assert: ((store listPurchasesTotalFromClientId: anUser pass: 'chau') ) = 2954.0.
 	! !
 
-!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/6/2017 15:39:35'!
+!TestXXX methodsFor: 'TestStore' stamp: 'yn 11/6/2017 15:44:11'!
 test10StoreCanListSeveralUsersPurchases
 	| store anUser product product2 anUser2 |
 		store _ self StoreAndEditorial.
@@ -505,7 +505,7 @@ test10StoreCanListSeveralUsersPurchases
 	store addToCartId: (store usersCart: anUser) id product: product2 quantity: 6 .
 	store checkout:(store usersCart: anUser) id withNumberCard: '1122334455' owner: 'XXX' withExpiration:  GregorianMonthOfYear  current.
 	self assert: (store listPurchasesFromClientId: anUser pass: 'chau') size = 2.
-	
+	self assert: ((store listPurchasesTotalFromClientId: anUser pass: 'chau') ) = 2954.0.
 	
 	"Compra numero 2 user hola"
 	anUser2 _ self SigninUserStore: store clientId: 'hola' pass: 'hola' .
