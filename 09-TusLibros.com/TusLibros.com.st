@@ -605,16 +605,17 @@ initialize
 Cart class
 	instanceVariableNames: ''!
 
-!Cart class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 17:54:41'!
+!Cart class methodsFor: 'messageError' stamp: 'ELR 10/27/2017 18:29:53'!
+invalidProductErrorDescription
+	^'Producto no perteneciente a la editorial'.! !
+
+
+!Cart class methodsFor: 'construct' stamp: 'ELR 10/27/2017 17:54:41'!
 fromEditorial: anEditorialName 
 	| aNewCart |
 	aNewCart _ self new.
 	aNewCart editorial: anEditorialName .
 	^aNewCart .! !
-
-!Cart class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:29:53'!
-invalidProductErrorDescription
-	^'Producto no perteneciente a la editorial'.! !
 
 
 !classDefinition: #Cashier category: #'TusLibros.com'!
@@ -676,20 +677,21 @@ editorial: anEditorial
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'yn 10/29/2017 15:09:34'!
+!Cashier class methodsFor: 'messageError' stamp: 'yn 10/29/2017 15:09:34'!
 CashierEmptyCartErrorDescription
 	^'No es posible hacer checkout de un carrito vacio'.! !
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:02:24'!
+!Cashier class methodsFor: 'messageError' stamp: 'ELR 10/27/2017 19:37:55'!
+invalidCreditCardErrorDescription
+	^'Tarjeta vencida pa'.! !
+
+
+!Cashier class methodsFor: 'construct' stamp: 'ELR 10/27/2017 19:02:24'!
 from: anEditorial 
 	| cashier |
 	cashier _ self new.
 	cashier editorial: anEditorial.
 	^cashier.! !
-
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:37:55'!
-invalidCreditCardErrorDescription
-	^'Tarjeta vencida pa'.! !
 
 
 !classDefinition: #CreditCard category: #'TusLibros.com'!
@@ -735,7 +737,7 @@ owner
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:47:05'!
+!CreditCard class methodsFor: 'construct' stamp: 'yn 10/30/2017 18:47:05'!
 numberCard: aNumberCard owner: aOwner withExpiration: aGregorianMonthOfYear
 	| card |
 	card _ self new.
@@ -746,7 +748,7 @@ numberCard: aNumberCard owner: aOwner withExpiration: aGregorianMonthOfYear
 	
 	! !
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 18:40:39'!
+!CreditCard class methodsFor: 'construct' stamp: 'yn 10/30/2017 18:40:39'!
 withExpiration: aGregorianMonthOfYear 
 	
 	| aCard |
@@ -754,7 +756,7 @@ withExpiration: aGregorianMonthOfYear
 	aCard expiration: aGregorianMonthOfYear .
 	^aCard.! !
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 19:35:38'!
+!CreditCard class methodsFor: 'construct' stamp: 'ELR 10/27/2017 19:35:38'!
 withExpirationMonth: aGregorianMonth year: aGregorianYear 
 	| card |
 	card _ self new.
@@ -825,7 +827,7 @@ priceFor: aProduct
 Editorial class
 	instanceVariableNames: ''!
 
-!Editorial class methodsFor: 'as yet unclassified' stamp: 'ELR 10/27/2017 18:09:11'!
+!Editorial class methodsFor: 'construct' stamp: 'ELR 10/27/2017 18:09:11'!
 withName: aName 
 	| editorial |
 	editorial _ self new.
@@ -896,18 +898,18 @@ debitOperation: aTotalOperation with: aCreditCard
 MPProcesorSimulator class
 	instanceVariableNames: ''!
 
-!MPProcesorSimulator class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 21:14:49'!
+!MPProcesorSimulator class methodsFor: 'messageError' stamp: 'yn 10/30/2017 21:14:49'!
 creditCardInvalidFoundsErrorDescription
 	^'Tarjeta Robada'.! !
 
-!MPProcesorSimulator class methodsFor: 'as yet unclassified' stamp: 'yn 10/30/2017 20:54:06'!
+!MPProcesorSimulator class methodsFor: 'messageError' stamp: 'yn 10/30/2017 20:54:06'!
 creditCardOutOfFoundsErrorDescription
 	^'Fondos Insuficientes'.! !
 
 
 !classDefinition: #Store category: #'TusLibros.com'!
 Object subclass: #Store
-	instanceVariableNames: 'editorial users usersCart catalog cashier historicPurchases timeProvider'
+	instanceVariableNames: 'editorial users usersCart catalog cashier historicPurchases timeProvider idCarts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
@@ -947,6 +949,10 @@ for: anEditorial
 	catalog _ anEditorial  catalog. 
 	cashier _ Cashier from: editorial.! !
 
+!Store methodsFor: 'initialization' stamp: 'yn 11/5/2017 21:58:17'!
+idCarts: aIdCart 
+	idCarts _ aIdCart .! !
+
 !Store methodsFor: 'initialization' stamp: 'yn 11/3/2017 20:11:42'!
 initialize
 
@@ -966,6 +972,11 @@ addToCartId: aCartId product: aProduct quantity: aCopies
 	| cart |
 	cart _ self getCartFromId: aCartId. 
 	cart add: aProduct copies:aCopies.! !
+
+!Store methodsFor: 'adding' stamp: 'yn 11/5/2017 21:55:59'!
+idNext
+	idCarts _ idCarts  + 1.
+	^idCarts ! !
 
 
 !Store methodsFor: 'users' stamp: 'yn 11/2/2017 20:27:17'!
@@ -1024,34 +1035,36 @@ getCartFromId: aId
 Store class
 	instanceVariableNames: ''!
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 13:57:36'!
+!Store class methodsFor: 'constructor' stamp: 'yn 11/5/2017 22:00:10'!
 from: anEditorial 
 	| aStore |
 	aStore _ self new.
 	aStore for: anEditorial .
 	aStore withTimeFrom: DateAndTime .
+	aStore idCarts: 1 .
 	^aStore.! !
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:16:08'!
+!Store class methodsFor: 'constructor' stamp: 'yn 11/5/2017 22:03:53'!
 from: anEditorial withTimeFrom: aCalendarClass
 	| aStore |
 	aStore _ self from: anEditorial.
 	aStore withTimeFrom: aCalendarClass.
 	^aStore.! !
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:47:20'!
+
+!Store class methodsFor: 'messageError' stamp: 'ELR 11/5/2017 10:47:20'!
 invalidCartErrorMessage
 	^'Carrito invalido'.! !
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:27:55'!
+!Store class methodsFor: 'messageError' stamp: 'yn 11/2/2017 20:27:55'!
 invalidPassErrorMessage
 	^'Password incorrecta'.! !
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/2/2017 20:07:27'!
+!Store class methodsFor: 'messageError' stamp: 'yn 11/2/2017 20:07:27'!
 invalidUserErrorMessage
 	^'Usuario no registrado en el STORE'.! !
 
-!Store class methodsFor: 'as yet unclassified' stamp: 'yn 11/3/2017 20:05:51'!
+!Store class methodsFor: 'messageError' stamp: 'yn 11/3/2017 20:05:51'!
 purchasesListError
 	^'Error a Listar'! !
 
@@ -1077,9 +1090,9 @@ add: aProduct copies: aCopies
 createdAt
 	^createdTime! !
 
-!StoreCart methodsFor: 'testing' stamp: 'yn 11/2/2017 21:06:58'!
+!StoreCart methodsFor: 'testing' stamp: 'yn 11/5/2017 21:47:24'!
 id
-	^self hash. ! !
+	^id. ! !
 
 !StoreCart methodsFor: 'testing' stamp: 'yn 11/3/2017 19:54:22'!
 isEmpty
@@ -1094,6 +1107,10 @@ products
 createdAt: aTimeReification 
 	createdTime _ aTimeReification .! !
 
+!StoreCart methodsFor: 'initialization' stamp: 'yn 11/5/2017 21:53:17'!
+createdId: aIdCart 
+	id _ aIdCart .! !
+
 !StoreCart methodsFor: 'initialization' stamp: 'yn 11/3/2017 19:10:50'!
 store: aStore 
 	store _ aStore.  
@@ -1106,11 +1123,12 @@ store: aStore
 StoreCart class
 	instanceVariableNames: ''!
 
-!StoreCart class methodsFor: 'as yet unclassified' stamp: 'ELR 11/5/2017 10:19:53'!
+!StoreCart class methodsFor: 'constructor' stamp: 'yn 11/5/2017 21:48:05'!
 fromStore: aStore 
 	| aStoreCart |
 	aStoreCart _ self new.
 	aStoreCart store: aStore.
 	aStoreCart createdAt: aStore time.
+	aStoreCart createdId: aStore idNext.
 	^aStoreCart.
 	! !
