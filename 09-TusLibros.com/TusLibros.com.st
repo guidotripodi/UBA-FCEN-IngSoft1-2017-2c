@@ -871,24 +871,25 @@ Object subclass: #HistoricClient
 	poolDictionaries: ''
 	category: 'TusLibros.com'!
 
-!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:22:20'!
+!HistoricClient methodsFor: 'testing' stamp: 'yn 11/6/2017 15:27:00'!
+storeCart
+	^aStoreCarts .! !
+
+!HistoricClient methodsFor: 'testing' stamp: 'yn 11/6/2017 15:24:52'!
+total
+	^totalHistoric .! !
+
+
+!HistoricClient methodsFor: 'setting' stamp: 'yn 11/6/2017 15:22:20'!
 initialize
 	aStoreCarts _ OrderedCollection new.
 	totalHistoric _ 0! !
 
-!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:27:00'!
-storeCart
-	^aStoreCarts .! !
-
-!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:21:41'!
+!HistoricClient methodsFor: 'setting' stamp: 'yn 11/6/2017 15:21:41'!
 storeCart: aStoreCart 
 	aStoreCarts add: aStoreCart .! !
 
-!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:24:52'!
-total
-	^totalHistoric .! !
-
-!HistoricClient methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:23:28'!
+!HistoricClient methodsFor: 'setting' stamp: 'yn 11/6/2017 15:23:28'!
 total: aTotal 
 	| subtotal |
 	subtotal _ totalHistoric  + aTotal .
@@ -900,7 +901,7 @@ total: aTotal
 HistoricClient class
 	instanceVariableNames: ''!
 
-!HistoricClient class methodsFor: 'as yet unclassified' stamp: 'yn 11/6/2017 15:21:15'!
+!HistoricClient class methodsFor: 'construct' stamp: 'yn 11/6/2017 15:21:15'!
 from: aStoreCart 
 	| aHistoricClient |
 	aHistoricClient _ self new.
