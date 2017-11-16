@@ -1,121 +1,21 @@
-Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber town zipCode province'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 13:27'!streetName: aStreetName
- 
-	streetName := aStreetName ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 16:12'!streetName
+Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber town zipCode province'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!Address methodsFor: 'twon' stamp: 'HernanWilkinson 10/28/2016 16:07'!town: aTown 	town := aTown! !!Address methodsFor: 'twon' stamp: 'HernanWilkinson 10/28/2016 16:12'!town	^town! !!Address methodsFor: 'zip code' stamp: 'HernanWilkinson 10/28/2016 16:13'!zipCode	^zipCode! !!Address methodsFor: 'zip code' stamp: 'HernanWilkinson 10/28/2016 16:08'!zipCode: aZipCode 	zipCode := aZipCode! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 13:27'!streetNumber: aStreetNumber 	streetNumber := aStreetNumber ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 16:12'!streetNumber	^streetNumber ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 13:27'!streetName: aStreetName 	streetName := aStreetName ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 16:12'!streetName	^streetName ! !!Address methodsFor: 'province' stamp: 'HernanWilkinson 10/28/2016 16:11'!province	^province! !!Address methodsFor: 'province' stamp: 'HernanWilkinson 10/28/2016 16:08'!province: aProvince 	province := aProvince	! !!Address methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 11/1/2016 10:06'!isAt: aStreetName
 
-	^streetName ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 16:12'!streetNumber
+	^streetName = aStreetName ! !Object subclass: #Customer	instanceVariableNames: 'id firstName lastName identificationType identificationNumber addresses'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!Customer methodsFor: 'initialization' stamp: 'HernanWilkinson 10/28/2016 13:26'!initialize	super initialize.	addresses := OrderedCollection new.! !!Customer methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 11/1/2016 10:05'!addressAt: aStreetName ifNone: noneClosure 
+	
+	^addresses detect: [ :anAddress | anAddress isAt: aStreetName ] ifNone: noneClosure ! !!Customer methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 11/1/2016 18:03'!addressesIsEmpty
+	
+	^addresses isEmpty! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 16:15'!lastName	^lastName ! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 13:09'!firstName: aName 	firstName := aName! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 13:09'!lastName: aLastName 	lastName := aLastName! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 16:15'!firstName		^firstName ! !!Customer methodsFor: 'importing' stamp: 'ip 11/6/2017 21:19'!importCustomers: anObject
+	"
+	self importCustomers
+	"
 
-	^streetNumber ! !!Address methodsFor: 'street' stamp: 'HernanWilkinson 10/28/2016 13:27'!streetNumber: aStreetNumber
- 
-	streetNumber := aStreetNumber ! !!Address methodsFor: 'province' stamp: 'HernanWilkinson 10/28/2016 16:11'!province
-
-	^province! !!Address methodsFor: 'province' stamp: 'HernanWilkinson 10/28/2016 16:08'!province: aProvince
- 
-	province := aProvince
-	! !!Address methodsFor: 'zip code' stamp: 'HernanWilkinson 10/28/2016 16:13'!zipCode
-
-	^zipCode! !!Address methodsFor: 'zip code' stamp: 'HernanWilkinson 10/28/2016 16:08'!zipCode: aZipCode
- 
-	zipCode := aZipCode! !!Address methodsFor: 'twon' stamp: 'HernanWilkinson 10/28/2016 16:07'!town: aTown
- 
-	town := aTown! !!Address methodsFor: 'twon' stamp: 'HernanWilkinson 10/28/2016 16:12'!town
-
-	^town! !Object subclass: #Customer	instanceVariableNames: 'id firstName lastName identificationType identificationNumber addresses'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!Customer methodsFor: 'initialization' stamp: 'HernanWilkinson 10/28/2016 13:26'!initialize
-
-	super initialize.
-	addresses := OrderedCollection new.! !!Customer methodsFor: 'importing' stamp: 'ip 11/6/2017 21:53'!addressAt: aStreetName
+	test importCustomers: nil! !!Customer methodsFor: 'importing' stamp: 'ip 11/6/2017 21:53'!addressAt: aStreetName
 	^ self addresses
-		detect: [ :anAddress | anAddress streetName = aStreetName ]! !!Customer methodsFor: 'importing' stamp: 'ip 11/6/2017 21:19'!importCustomers: anObject
-	"
-	self importCustomers
-	"
-
-	test importCustomers: nil! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 13:09'!firstName: aName
- 
-	firstName := aName! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 13:09'!lastName: aLastName
- 
-	lastName := aLastName
-! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 16:15'!lastName
-
-	^lastName ! !!Customer methodsFor: 'name' stamp: 'HernanWilkinson 10/28/2016 16:15'!firstName
+		detect: [ :anAddress | anAddress streetName = aStreetName ]! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 13:10'!identificationType: anIdentificationType 	identificationType := anIdentificationType! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 16:13'!identificationNumber		^identificationNumber ! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 13:10'!identificationNumber: anIdentificationNumber 	identificationNumber := anIdentificationNumber! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 16:13'!identificationType		^identificationType ! !!Customer methodsFor: 'addresses' stamp: 'HernanWilkinson 10/28/2016 13:27'!addAddress: anAddress 	addresses add: anAddress ! !!Customer methodsFor: 'addresses' stamp: 'HernanWilkinson 11/1/2016 09:43'!numberOfAddresses
 	
-	^firstName ! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 16:13'!identificationNumber
-	
-	^identificationNumber ! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 13:10'!identificationNumber: anIdentificationNumber
- 
-	identificationNumber := anIdentificationNumber! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 13:10'!identificationType: anIdentificationType 
-
-	identificationType := anIdentificationType! !!Customer methodsFor: 'identification' stamp: 'HernanWilkinson 10/28/2016 16:13'!identificationType
-	
-	^identificationType ! !!Customer methodsFor: 'addresses' stamp: 'HernanWilkinson 10/28/2016 13:25'!addresses
-
-	^ addresses! !!Customer methodsFor: 'addresses' stamp: 'HernanWilkinson 10/28/2016 13:27'!addAddress: anAddress 
-
-	addresses add: anAddress ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Customer class	instanceVariableNames: ''!!Customer class methodsFor: 'importing' stamp: 'HernanWilkinson 11/1/2016 08:39'!importCustomers
-
-	"
-	self importCustomers
-	"
-	| inputStream session newCustomer line |
-	
-	inputStream := FileStream fileNamed: 'input.txt'.
-	session := DataBaseSession for: (Array 
-		with: (ClassMapping 
-			withDefaultTableNameFor: Address 
-			mappingAll: (Array 
-				with: (EmbededMapping withDefaultFieldNameFor: #streetName)
-				with: (EmbededMapping withDefaultFieldNameFor: #streetNumber)
-				with: (EmbededMapping withDefaultFieldNameFor: #town)
-				with: (EmbededMapping withDefaultFieldNameFor: #zipCode)
-				with: (EmbededMapping withDefaultFieldNameFor: #province))) 
-		with: (ClassMapping 
-			withDefaultTableNameFor: Customer 
-			mappingAll: (Array 
-				with: (EmbededMapping withDefaultFieldNameFor: #firstName)
-				with: (EmbededMapping withDefaultFieldNameFor: #lastName)
-				with: (EmbededMapping withDefaultFieldNameFor: #identificationType)
-				with: (EmbededMapping withDefaultFieldNameFor: #identificationNumber)
-				with: (OneToManyMapping withDefaultFieldNameFor: #addresses ofType: Address)))).
-	session open.
-	session beginTransaction.
-
-	line := inputStream nextLine.
-	[ line notNil ] whileTrue: [ 
-		(line beginsWith: 'C') ifTrue: [ | customerData |
-			customerData := line substrings: {$,}.
-			newCustomer := Customer new.
-			newCustomer firstName: customerData second.
-			newCustomer lastName: customerData third.
-			newCustomer identificationType: customerData fourth.
-			newCustomer identificationNumber: customerData fourth.
-			session persist: newCustomer ].
-		
-		(line beginsWith: 'A') ifTrue: [ | addressData newAddress |
-			addressData := line substrings: { $, }.
-			newAddress := Address new.
-			newAddress streetName: addressData second.
-			newAddress streetNumber: addressData third asInteger. 
-			newAddress town: addressData fourth.
-			newAddress zipCode: addressData fifth asInteger.
-			newAddress province: addressData fourth.
-			newCustomer addAddress: newAddress. ].
-			
-			line := inputStream nextLine. ].
-			
-		session commit.
-		session close.
-		
-		inputStream close.
-		! !Object subclass: #CustomerImport	instanceVariableNames: 'session'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!CustomerImport methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:33'!createCustomerFromDataLine: customerData	| newCustomer |	newCustomer := Customer new.	newCustomer firstName: customerData second.	newCustomer lastName: customerData third.	newCustomer identificationType: customerData fourth.	newCustomer identificationNumber: customerData fifth.	^ newCustomer! !!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:53'!addAddressFromDataLine: line toACustomer: newCustomer	| addressData newAddress |	newCustomer ifNil: [^ self error: CustomerImport  noCustomerForAddressErrorDescription ] .	addressData := line substrings: {$,}.	newAddress := self createAddressFromDataLine: addressData.	newCustomer addAddress: newAddress! !!CustomerImport methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:35'!importCustomers: anInputStream	| newCustomer line |	line := anInputStream nextLine.	[ line notNil ]		whileTrue: [ (line beginsWith: 'C')				ifTrue: [ newCustomer := self						persistNewCustomerFromDataLine: line						into: session ].			(line beginsWith: 'A')				ifTrue:					[ self addAddressFromDataLine: line toACustomer: newCustomer ].			line := anInputStream nextLine ]! !!CustomerImport methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:33'!persistNewCustomerFromDataLine: line into: session	| newCustomer customerData |	customerData := line substrings: {$,}.	newCustomer := self createCustomerFromDataLine: customerData.	session persist: newCustomer.	^ newCustomer! !!CustomerImport methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:33'!createAddressFromDataLine: addressData	| newAddress |	newAddress := Address new.	newAddress streetName: addressData second.	newAddress streetNumber: addressData third asInteger.	newAddress town: addressData fourth.	newAddress zipCode: addressData fifth asInteger.	newAddress province: addressData sixth.	^ newAddress! !!CustomerImport methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:35'!persistNewCustomerFromDataLine: line	| newCustomer customerData |	customerData := line substrings: {$,}.	newCustomer := self createCustomerFromDataLine: customerData.	session persist: newCustomer.	^ newCustomer! !!CustomerImport methodsFor: 'as yet unclassified' stamp: 'Anonymous 11/9/2017 20:37'!session: aDataBaseSession 	session := aDataBaseSession! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!CustomerImport class	instanceVariableNames: ''!!CustomerImport class methodsFor: 'importing' stamp: 'Anonymous 11/9/2017 20:33'!with: session	| ci |	ci := self new.	ci session: session.	^ci! !!CustomerImport class methodsFor: 'as yet unclassified' stamp: 'GuidoTripodi 11/9/2017 20:49'!noCustomerForAddressErrorDescription	^'Datos de entrada invalidos. No se encuentra Customer para la direccion ingresada. Muchas gracias vuelva prontos.'	! !TestCase subclass: #CustomerImporterTest	instanceVariableNames: 'session anInputStream inputStream'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!test04InputEmptyShouldntRaiseErrors	inputStream := self emptyInput.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 0.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!test02verifyImportCustomerCorrectlyForReadStream	inputStream := self validDataInput.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 2.	self assertCustomerPepeSanchezWasImportedCorrectly.	self assertCustomerJuanPerezWasImportedCorrectly! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:09'!assertCustomer: aCustomer hasFirstName: aFirstName hasLastName: aLastName hasIdentificationType: aIdentificationType hasIdentificationNumber: aIdentificationNumber
-	self assert: aCustomer firstName equals: aFirstName.
-	self assert: aCustomer lastName equals: aLastName.
-	self assert: aCustomer identificationType equals: aIdentificationType.
-	self assert: aCustomer identificationNumber equals: aIdentificationNumber.
-! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:07'!assertCustomerJuanPerezWasImportedCorrectly
+	^addresses size! !!Customer methodsFor: 'addresses' stamp: 'HernanWilkinson 10/28/2016 13:25'!addresses	^ addresses! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Customer class	instanceVariableNames: ''!!Customer class methodsFor: 'importing' stamp: 'HernanWilkinson 11/1/2016 08:39'!importCustomers	"	self importCustomers	"	| inputStream session newCustomer line |		inputStream := FileStream fileNamed: 'input.txt'.	session := DataBaseSession for: (Array 		with: (ClassMapping 			withDefaultTableNameFor: Address 			mappingAll: (Array 				with: (EmbededMapping withDefaultFieldNameFor: #streetName)				with: (EmbededMapping withDefaultFieldNameFor: #streetNumber)				with: (EmbededMapping withDefaultFieldNameFor: #town)				with: (EmbededMapping withDefaultFieldNameFor: #zipCode)				with: (EmbededMapping withDefaultFieldNameFor: #province))) 		with: (ClassMapping 			withDefaultTableNameFor: Customer 			mappingAll: (Array 				with: (EmbededMapping withDefaultFieldNameFor: #firstName)				with: (EmbededMapping withDefaultFieldNameFor: #lastName)				with: (EmbededMapping withDefaultFieldNameFor: #identificationType)				with: (EmbededMapping withDefaultFieldNameFor: #identificationNumber)				with: (OneToManyMapping withDefaultFieldNameFor: #addresses ofType: Address)))).	session open.	session beginTransaction.	line := inputStream nextLine.	[ line notNil ] whileTrue: [ 		(line beginsWith: 'C') ifTrue: [ | customerData |			customerData := line substrings: {$,}.			newCustomer := Customer new.			newCustomer firstName: customerData second.			newCustomer lastName: customerData third.			newCustomer identificationType: customerData fourth.			newCustomer identificationNumber: customerData fourth.			session persist: newCustomer ].				(line beginsWith: 'A') ifTrue: [ | addressData newAddress |			addressData := line substrings: { $, }.			newAddress := Address new.			newAddress streetName: addressData second.			newAddress streetNumber: addressData third asInteger. 			newAddress town: addressData fourth.			newAddress zipCode: addressData fifth asInteger.			newAddress province: addressData fourth.			newCustomer addAddress: newAddress. ].						line := inputStream nextLine. ].					session commit.		session close.				inputStream close.		! !Object subclass: #CustomerImport	instanceVariableNames: 'system newCustomer'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 18:03'!persistNewCustomerFromDataLine: line	| newCustomer customerData |	customerData := line substrings: {$,}.	newCustomer := self createCustomerFromDataLine: customerData.	^ newCustomer! !!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 23:48'!createAddressFromDataLine: addressData	| newAddress |	newAddress := Address new.	newAddress streetName: addressData second.	newAddress streetNumber: addressData third asInteger.	newAddress town: addressData fourth.	newAddress zipCode: addressData fifth asInteger.	newAddress province: addressData sixth.	^ newCustomer addAddress: newAddress! !!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 23:15'!importCustomers: anInputStream	| newCustomer line |	line := anInputStream nextLine.	[ line notNil ]		whileTrue: [ (line beginsWith: 'C')				ifTrue: [ newCustomer := self						persistNewCustomerFromDataLine: line ].			(line beginsWith: 'A')				ifTrue:					[ self addAddressFromDataLine: line toACustomer: newCustomer ].			line := anInputStream nextLine ].! !!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 23:46'!createCustomerFromDataLine: customerData	newCustomer := Customer new.	newCustomer firstName: customerData second.	newCustomer lastName: customerData third.	newCustomer identificationType: customerData fourth.	newCustomer identificationNumber: customerData fifth.	system add: newCustomer.	^ newCustomer! !!CustomerImport methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:53'!addAddressFromDataLine: line toACustomer: newCustomer	| addressData newAddress |	newCustomer ifNil: [^ self error: CustomerImport  noCustomerForAddressErrorDescription ] .	addressData := line substrings: {$,}.	newAddress := self createAddressFromDataLine: addressData.	newCustomer addAddress: newAddress! !!CustomerImport methodsFor: 'instance creation' stamp: 'GuidoTripodi 11/15/2017 16:59'!with: aSystem		system := aSystem ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!CustomerImport class	instanceVariableNames: ''!!CustomerImport class methodsFor: 'as yet unclassified' stamp: 'GuidoTripodi 11/9/2017 20:49'!noCustomerForAddressErrorDescription	^'Datos de entrada invalidos. No se encuentra Customer para la direccion ingresada. Muchas gracias vuelva prontos.'	! !!CustomerImport class methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 23:37'!with: session		| ci |	ci := self new.	ci with: session.	^ci! !TestCase subclass: #CustomerImporterTest	instanceVariableNames: 'session anInputStream inputStream system customer'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:56'!emptyInput	^ ReadStream		on:			''					! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!test04InputEmptyShouldntRaiseErrors	inputStream := self emptyInput.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 0.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:01'!invalidDataInputFormated	^ ReadStream		on:			'C,Pepe,Sanchez,D,22333444,FloresA,San Martin,3322,Olivos,1636,BsAs,PeruA,Maipu,888,Florida,1122,Buenos AiresC,Juan,Perez,C,23-25666777-9A,Alem,1122,CABA,1001,CABA'! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 22:55'!assertCustomerJuanPerezWasImportedCorrectly
 	| aCustomer aCustomerAddress |
-	aCustomer := self
-		customerAt: session
-		withIdentificationNumber: '23-25666777-9'
-		withIdentificationType: 'C'.
+	aCustomer := self customerIdentifiedAs: '23-25666777-9' ofType: 'C'.	aCustomer := aCustomer  anyOne .
 	self
 		assertCustomer: aCustomer
 		hasFirstName: 'Juan'
@@ -128,12 +28,10 @@ Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber to
 		hasStreetName: 'Alem'
 		hasStreetNumber: 1122
 		hasTown: 'CABA'
-		hasZipCode: 1001		province: 'CABA'.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:41'!validDataInput	^ ReadStream		on:			'C,Pepe,Sanchez,D,22333444A,San Martin,3322,Olivos,1636,BsAsA,Maipu,888,Florida,1122,Buenos AiresC,Juan,Perez,C,23-25666777-9A,Alem,1122,CABA,1001,CABA'! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:38'!importCustomersAndAddresses	| importCustomer |	importCustomer := CustomerImport with: session.	importCustomer importCustomers: inputStream! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:06'!assertCustomerPepeSanchezWasImportedCorrectly
+		hasZipCode: 1001		province: 'CABA'.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:53'!test03AddressWithNoCustomerShouldRaiseError	inputStream := self invalidDataInput1AddressOnly.self		should: [ self importCustomersAndAddresses ]		raise: Error		withExceptionDo: [ :anError |			self assert: anError messageText = CustomerImport noCustomerForAddressErrorDescription ]! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 18:07'!assertCorrectNumberOfCustomersWereImported: aNumber
+	self assert: (system allCustomers) size equals: aNumber 	! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:41'!validDataInput	^ ReadStream		on:			'C,Pepe,Sanchez,D,22333444A,San Martin,3322,Olivos,1636,BsAsA,Maipu,888,Florida,1122,Buenos AiresC,Juan,Perez,C,23-25666777-9A,Alem,1122,CABA,1001,CABA'! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 18:42'!assertCustomerPepeSanchezWasImportedCorrectly
 	| aCustomer aCustomerAddress |
-	aCustomer := self
-		customerAt: session
-		withIdentificationNumber: '22333444'
-		withIdentificationType: 'D'.
+	aCustomer := self customerIdentifiedAs: '22333444' ofType: 'D'.
 	self
 		assertCustomer: aCustomer
 		hasFirstName: 'Pepe'
@@ -153,25 +51,24 @@ Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber to
 		hasStreetName: 'Maipu'
 		hasStreetNumber: 888
 		hasTown: 'Florida'
-		hasZipCode: 1122		province: 'Buenos Aires'.	! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 18:43'!customerAt: aSession withIdentificationNumber: anIdentificationNumber withIdentificationType: anIdentificationType
-	^ (aSession
-		select:  
-			[ :aCustomer | aCustomer identificationNumber = anIdentificationNumber and: aCustomer identificationType = anIdentificationType ]
-		ofType: Customer) anyOne.		! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:53'!test03AddressWithNoCustomerShouldRaiseError	inputStream := self invalidDataInput1AddressOnly.self		should: [ self importCustomersAndAddresses ]		raise: Error		withExceptionDo: [ :anError |			self assert: anError messageText = CustomerImport noCustomerForAddressErrorDescription ]! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:43'!invalidDataInput1AddressOnly	^ ReadStream on: 'A,San Martin,3322,Olivos,1636,BsAs'! !!CustomerImporterTest methodsFor: 'importing' stamp: 'ip 11/6/2017 21:19'!tearDown
-	inputStream close.
-	session commit.
-	session close.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!test01verifyImportCustomerCorrectlyForFIleStream	inputStream := FileStream		fileNamed: '/home/guido/Documentos/FACU/INGS1/pharo6.1/input.txt'.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 2.	self assertCustomerPepeSanchezWasImportedCorrectly.	self assertCustomerJuanPerezWasImportedCorrectly! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:09'!assertCustomerAddress: aCustomerAddress hasStreetName: aStreetName hasStreetNumber: aStreetNumber hasTown: aTown hasZipCode: aZipCode province: aProvince
+		hasZipCode: 1122		province: 'Buenos Aires'.	! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:43'!invalidDataInput1AddressOnly	^ ReadStream on: 'A,San Martin,3322,Olivos,1636,BsAs'! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/16/2017 00:40'!setUp
+								system := TransistSystem  new.	system start.	system beginTransaction! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/16/2017 01:32'!importCustomersAndAddresses	| importCustomer |	importCustomer := CustomerImport with: system.	importCustomer importCustomers: inputStream! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:09'!assertCustomerAddress: aCustomerAddress hasStreetName: aStreetName hasStreetNumber: aStreetNumber hasTown: aTown hasZipCode: aZipCode province: aProvince
 	self assert: aCustomerAddress streetName equals: aStreetName.
 	self assert: aCustomerAddress streetNumber equals: aStreetNumber.
 	self assert: aCustomerAddress town equals: aTown.
 	self assert: aCustomerAddress zipCode equals: aZipCode.
-	self assert: aCustomerAddress province equals: aProvince.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 20:56'!emptyInput	^ ReadStream		on:			''					! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!assertCorrectNumberOfCustomersWereImported: aNumber
-	self assert: (session selectAllOfType: Customer) size equals: aNumber 	! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 18:43'!setUp
-	session := DataBaseSession
-		for:
-			(Array
-				with:
-					(ClassMapping
+	self assert: aCustomerAddress province equals: aProvince.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 19:09'!assertCustomer: aCustomer hasFirstName: aFirstName hasLastName: aLastName hasIdentificationType: aIdentificationType hasIdentificationNumber: aIdentificationNumber
+	self assert: aCustomer firstName equals: aFirstName.
+	self assert: aCustomer lastName equals: aLastName.
+	self assert: aCustomer identificationType equals: aIdentificationType.
+	self assert: aCustomer identificationNumber equals: aIdentificationNumber.
+! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/15/2017 18:33'!tearDown
+	system commit.
+	system close.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:08'!test01verifyImportCustomerCorrectlyForFIleStream	inputStream := FileStream		fileNamed: '/home/guido/Documentos/FACU/INGS1/pharo6.1/input.txt'.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 2.	self assertCustomerPepeSanchezWasImportedCorrectly.	self assertCustomerJuanPerezWasImportedCorrectly! !!CustomerImporterTest methodsFor: 'importing' stamp: 'Anonymous 11/8/2017 18:43'!customerAt: aSession withIdentificationNumber: anIdentificationNumber withIdentificationType: anIdentificationType
+	^ (aSession
+		select:  
+			[ :aCustomer | aCustomer identificationNumber = anIdentificationNumber and: aCustomer identificationType = anIdentificationType ]
+		ofType: Customer) anyOne.		! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/16/2017 01:37'!test02verifyImportCustomerCorrectlyForReadStream	inputStream := self validDataInput.	self importCustomersAndAddresses.	self assertCorrectNumberOfCustomersWereImported: 2.	self assertCustomerJuanPerezWasImportedCorrectly.	self assertCustomerPepeSanchezWasImportedCorrectly.	! !!CustomerImporterTest methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 22:46'!customerIdentifiedAs: anIdNumber ofType: aType	^ system customerIdentifiedAs: anIdNumber ofType: aType! !Object subclass: #System	instanceVariableNames: 'session'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 16:49'!add: newCustomer	self subclassResponsibility	! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:42'!commit	self subclassResponsibility! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:42'!close	self subclassResponsibility! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:42'!startself subclassResponsibility	! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:42'!customerIdentifiedAs: anIdNumber ofType: aType	self subclassResponsibility	! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:42'!beginTransaction self subclassResponsibility! !!System methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 16:49'!allCustomers	self subclassResponsibility! !System subclass: #ContinueSystem	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:04'!close	session close .! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:04'!commit	session commit .! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:03'!start	session open.! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:05'!customerIdentifiedAs: anIdNumber ofType: aType	^ session		select: [ :aCustomer | 			aCustomer identificationNumber = anIdNumber				and: [ aCustomer identificationType = aType ] ]		ofType: Customer! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 16:54'!beginTransaction	session beginTransaction .! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:04'!allCustomers	^ session selectAllOfType: Customer! !!ContinueSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:03'!initialize	super initialize.	session := (DataBaseSession for: (Array with: self mapCustomers with: self mapAddress))! !!ContinueSystem methodsFor: 'adding' stamp: 'GuidoTripodi 11/15/2017 17:04'!add: newCustomer	session persist: newCustomer! !!ContinueSystem methodsFor: 'as yet unclassified' stamp: 'GuidoTripodi 11/15/2017 16:25'!mapAddress^(ClassMapping
 						withDefaultTableNameFor: Address
 						mappingAll:
 							(Array
@@ -179,9 +76,7 @@ Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber to
 								with: (EmbededMapping withDefaultFieldNameFor: #streetNumber)
 								with: (EmbededMapping withDefaultFieldNameFor: #town)
 								with: (EmbededMapping withDefaultFieldNameFor: #zipCode)
-								with: (EmbededMapping withDefaultFieldNameFor: #province)))
-				with:
-					(ClassMapping
+								with: (EmbededMapping withDefaultFieldNameFor: #province)))! !!ContinueSystem methodsFor: 'as yet unclassified' stamp: 'GuidoTripodi 11/15/2017 16:26'!mapCustomers	^(ClassMapping
 						withDefaultTableNameFor: Customer
 						mappingAll:
 							(Array
@@ -189,6 +84,4 @@ Object subclass: #Address	instanceVariableNames: 'id streetName streetNumber to
 								with: (EmbededMapping withDefaultFieldNameFor: #lastName)
 								with: (EmbededMapping withDefaultFieldNameFor: #identificationType)
 								with: (EmbededMapping withDefaultFieldNameFor: #identificationNumber)
-								with: (OneToManyMapping withDefaultFieldNameFor: #addresses ofType: Address)))).
-	session open.
-	session beginTransaction.! !!CustomerImporterTest methodsFor: 'importing' stamp: 'GuidoTripodi 11/9/2017 21:01'!invalidDataInputFormated	^ ReadStream		on:			'C,Pepe,Sanchez,D,22333444,FloresA,San Martin,3322,Olivos,1636,BsAs,PeruA,Maipu,888,Florida,1122,Buenos AiresC,Juan,Perez,C,23-25666777-9A,Alem,1122,CABA,1001,CABA'! !
+								with: (OneToManyMapping withDefaultFieldNameFor: #addresses ofType: Address))).! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!ContinueSystem class	instanceVariableNames: ''!!ContinueSystem class methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:07'!initialize	^ self new initialize.! !System subclass: #TransistSystem	instanceVariableNames: 'customers'	classVariableNames: ''	poolDictionaries: ''	category: '10Pines-C17-1-Model'!!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:06'!add: aCustomer	customers add: aCustomer.! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:43'!commit! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:45'!close! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:43'!start! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:06'!customerIdentifiedAs: anIdNumber ofType: aType	^ customers		select: [ :aCustomer | 			aCustomer identificationNumber = anIdNumber				and: [ aCustomer identificationType = aType ] ]! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/16/2017 00:45'!beginTransaction! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:06'!allCustomers	^ customers.! !!TransistSystem methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:11'!initialize		super initialize.	customers := OrderedCollection new.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!TransistSystem class	instanceVariableNames: ''!!TransistSystem class methodsFor: 'initialization' stamp: 'GuidoTripodi 11/15/2017 17:07'!initialize	^ self new initialize.! !ContinueSystem initialize!TransistSystem initialize!
