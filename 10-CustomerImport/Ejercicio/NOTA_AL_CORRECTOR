@@ -1,0 +1,3 @@
+El modelo 1 pasa todos los tests, no obstante nos dimos cuenta en iteraciones posteriores de una abstraccion del ERPSystem como Proxy de los
+otros 2 que sacaba código repetido. Desgraciadamente no pudimos hacer que pasen todos los test: el test2 de SupplierImporterTest falla por un problema al persistir en la base
+(posiblemente por cascading). Decidimos dejar la solucion ya que, de poder hacer pasar este test, representa una mejor solucion.
